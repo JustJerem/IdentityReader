@@ -1,0 +1,34 @@
+<resources>
+    <string name="nfc_title_idle">En attente</string>
+    <string name="nfc_title_connecting">Connexion en cours</string>
+    <string name="nfc_title_connected">Scan réussi</string>
+    <string name="nfc_title_disconnected">Déconnecté</string>
+    <string name="nfc_title_error">Scan non réussi</string>
+    <string name="nfc_title_disabled">NFC désactivé</string>
+
+    <string name="nfc_desc_idle">Veuillez placer la pièce d\'identité au dos du téléphone</string>
+    <string name="nfc_desc_connecting">Veuillez patienter pendant que l\'analyse de document…
+    </string>
+    <string name="nfc_desc_connected">La pièce d\'identité a été lue avec succès</string>
+    <string name="nfc_desc_disconnected">La connexion a été interrompue</string>
+    <string name="nfc_desc_error">Le scan a échoué, repositioner le téléphone</string>
+    <string name="nfc_desc_disabled">Le NFC est désactivé. Veuillez l\'activer dans les paramètres
+        de votre téléphone
+    </string>
+    <string name="rescan">Rescanner</string>
+    <string name="modifier">Modifier</string>
+    <string name="document_number">Numéro de document</string>
+    <string name="birthdate">Date de naissance</string>
+    <string name="expiration_date">Date d\'expiration</string>
+    <string name="cancel">Annuler</string>
+    <string name="confirm">Confirmer</string>
+    <string name="select_date">Select Date</string>
+    <string name="document_number_dots">"Numéro de Document: "</string>
+    <string name="birthdate_dots">"Date de Naissance: "</string>
+    <string name="expiration_date_dots">"Date d'Expiration: "</string>
+    <string name="expired_document_desc">Les informations pourraient être inexactes. Souhaitez-vous tout de même utiliser ces données ?</string>
+    <string name="expired_document_title">Document Expiré</string>
+    <string name="ok">OK</string>
+    <string name="no">Non</string>
+    <string name="yes">Oui</string>
+</resources>
