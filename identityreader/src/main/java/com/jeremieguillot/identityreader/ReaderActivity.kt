@@ -24,6 +24,8 @@ import com.jeremieguillot.identityreader.core.presentation.Destination
 import com.jeremieguillot.identityreader.core.ui.theme.IdentityReaderTheme
 import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderScreen
 import com.jeremieguillot.identityreader.scan.presentation.ScanScreen
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.security.Security
 import kotlin.reflect.typeOf
 
 const val ReaderResult = "identity_document"
@@ -34,6 +36,9 @@ class ReaderActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Security.removeProvider("BC")
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
+
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(
                 this, CAMERAX_PERMISSIONS, 0

@@ -61,7 +61,7 @@ fun ScanScreen(navController: NavHostController) {
                 is Success -> {
                     val type = result.data.type
                     when (type) {
-                        DocumentType.PASSPORT -> navController.navigate( ///todo add DocumentType.ID_CARD when France Connect reply, NFC new card working
+                        DocumentType.PASSPORT, DocumentType.ID_CARD -> navController.navigate(
                             Destination.ReaderScreen(result.data)
                         )
 

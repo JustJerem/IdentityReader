@@ -13,170 +13,127 @@ import net.sf.scuba.data.Gender
 import net.sf.scuba.smartcards.CardService
 import org.jmrtd.BACKey
 import org.jmrtd.BACKeySpec
+import org.jmrtd.PACEKeySpec
 import org.jmrtd.PassportService
 import org.jmrtd.lds.CardAccessFile
 import org.jmrtd.lds.PACEInfo
 import org.jmrtd.lds.icao.DG11File
 import org.jmrtd.lds.icao.DG12File
 import org.jmrtd.lds.icao.DG1File
-import java.io.IOException
 
 
 class NFCDocument {
 
     fun startReadTask(isoDep: IsoDep, mrz: MRZ): Result<IdentityDocument, Error> {
-        val bacKey: BACKeySpec = BACKey(mrz.documentNumber, mrz.dateOfBirth, mrz.dateOfExpiry)
+        val bacKey = BACKey(mrz.documentNumber, mrz.dateOfBirth, mrz.dateOfExpiry)
         return readPassport(isoDep, bacKey)
     }
 
-    private fun readPassport(
-        isoDep: IsoDep,
-        bacKey: BACKeySpec
-    ): Result<IdentityDocument, Error> {
+    private fun readPassport(isoDep: IsoDep, bacKey: BACKeySpec): Result<IdentityDocument, Error> {
+        val paceKey = PACEKeySpec.createMRZKey(bacKey)
 
-        try {
+        return runCatching {
             isoDep.timeout = 15_000
-//            performBAC(isoDep, bacKey)
-            val cardService = CardService.getInstance(isoDep).apply { open() }
-            val service = PassportService(
-                /* service = */ cardService,
-                /* maxTranceiveLengthForSecureMessaging = */
-                PassportService.NORMAL_MAX_TRANCEIVE_LENGTH,
-                /* maxBlockSize = */
-                PassportService.DEFAULT_MAX_BLOCKSIZE,
-                /* isSFIEnabled = */
-                false,
-                /* shouldCheckMAC = */
-                false
-            ).apply { open() }
+            val cardService = createCardService(isoDep)
+            val passportService = createPassportService(cardService)
 
-
-
-            val paceSucceeded = doPace(service, bacKey)
-            service.sendSelectApplet(paceSucceeded)
-            if (!paceSucceeded) try {
-                service.getInputStream(PassportService.EF_COM).read()
-            } catch (e: Exception) {
-                service.doBAC(bacKey)
+            if (performPace(passportService, paceKey)) {
+                passportService.sendSelectApplet(true)
+            } else {
+                performBacFallback(passportService, bacKey)
             }
 
-            val dg1File = DG1File(service.getInputStream(PassportService.EF_DG1))
-            val dg11File = DG11File(service.getInputStream(PassportService.EF_DG11))
-            val dg12File = DG12File(service.getInputStream(PassportService.EF_DG12))
-
-
-            return Result.Success(
-                IdentityDocument(
-                    type = DocumentType.PASSPORT,
-                    documentNumber = dg1File.mrzInfo.documentNumber,
-                    firstName = dg1File.mrzInfo.primaryIdentifier,
-                    lastName = dg1File.mrzInfo.secondaryIdentifier,
-                    gender = dg1File.mrzInfo.gender.toLetter(),
-                    issuingIsO3Country = dg1File.mrzInfo.issuingState,
-                    nationality = dg1File.mrzInfo.nationality,
-                    address = dg11File.permanentAddress.first().trimStart(),
-                    city = dg11File.permanentAddress[2],
-                    postalCode = dg11File.permanentAddress[1],
-                    country = dg11File.permanentAddress[4],
-                    placeOfBirth = dg11File.placeOfBirth.joinToString { it },
-                    birthDate = dg1File.mrzInfo.dateOfBirth.toSlashStringDate(forceDateInPast = true),
-                    expirationDate = dg1File.mrzInfo.dateOfExpiry.toSlashStringDate(),
-                    deliveryDate = dg12File.dateOfIssue.toSlashStringDate(pattern = "yyyyMMdd"),
-                )
-            )
-
-        } catch (e: Exception) {
-            Log.e(TAG, e.message.toString())
-            return Result.Error(DataError.Local.INVALID_DATA)
+            val identityDocument = extractIdentityDocument(passportService)
+            Result.Success(identityDocument)
+        }.getOrElse { exception ->
+            Log.e(TAG, "Failed to read passport: ${exception.message}", exception)
+            Result.Error(DataError.Local.INVALID_DATA)
         }
     }
 
-    private fun doPace(service: PassportService, bacKey: BACKeySpec): Boolean = runCatching {
+    // Creates and opens the CardService
+    private fun createCardService(isoDep: IsoDep): CardService {
+        return CardService.getInstance(isoDep).apply { open() }
+    }
 
-        val inputStream = service.getInputStream(
-//            0x3F00,
-            PassportService.EF_CARD_ACCESS,
-            PassportService.DEFAULT_MAX_BLOCKSIZE
-        )
-        CardAccessFile(inputStream)
-            .securityInfos
-            .filterIsInstance<PACEInfo>()
-            .forEach {
-                service.doPACE(
-                    bacKey,
-                    it.objectIdentifier,
-                    PACEInfo.toParameterSpec(it.parameterId),
-                    null
-                )
+    // Creates and opens the PassportService
+    private fun createPassportService(cardService: CardService): PassportService {
+        return PassportService(
+            /* service = */ cardService,
+            /* maxTranceiveLengthForSecureMessaging = */
+            PassportService.NORMAL_MAX_TRANCEIVE_LENGTH,
+            /* maxBlockSize = */
+            PassportService.DEFAULT_MAX_BLOCKSIZE,
+            /* isSFIEnabled = */
+            true,
+            /* shouldCheckMAC = */
+            false
+        ).apply { open() }
+    }
+
+    // Attempts to perform PACE and returns whether it succeeded
+    private fun performPace(passportService: PassportService, paceKey: PACEKeySpec): Boolean {
+        return runCatching {
+            passportService.getInputStream(PassportService.EF_CARD_ACCESS).use { stream ->
+                val paceInfo = CardAccessFile(stream).securityInfos
+                    .filterIsInstance<PACEInfo>()
+                    .firstOrNull() ?: throw IllegalArgumentException("PACEInfo not found")
+
+                val parameterSpec = PACEInfo.toParameterSpec(paceInfo.parameterId)
+                passportService.doPACE(paceKey, paceInfo.objectIdentifier, parameterSpec)
             }
-        true
-    }.getOrElse {
-        Log.w(TAG, it)
-        false
+            true
+        }.onFailure { exception ->
+            Log.w(TAG, "PACE failed: ${exception.message}", exception)
+        }.getOrDefault(false)
+    }
+
+    // Fallback to BAC if PACE fails
+    private fun performBacFallback(passportService: PassportService, bacKey: BACKeySpec) {
+        try {
+            passportService.getInputStream(PassportService.EF_COM).read()
+        } catch (e: Exception) {
+            passportService.doBAC(bacKey)
+        }
+    }
+
+    // Extracts the identity document information from the passport service
+    private fun extractIdentityDocument(passportService: PassportService): IdentityDocument {
+        val dg1File = DG1File(passportService.getInputStream(PassportService.EF_DG1))
+        val dg11File = DG11File(passportService.getInputStream(PassportService.EF_DG11))
+        val dg12File = DG12File(passportService.getInputStream(PassportService.EF_DG12))
+
+        return IdentityDocument(
+            type = DocumentType.PASSPORT,
+            documentNumber = dg1File.mrzInfo.documentNumber,
+            firstName = dg1File.mrzInfo.primaryIdentifier,
+            lastName = extractLastNames(dg11File.nameOfHolder),
+            gender = dg1File.mrzInfo.gender.toLetter(),
+            issuingIsO3Country = dg1File.mrzInfo.issuingState,
+            nationality = dg1File.mrzInfo.nationality,
+            address = dg11File.permanentAddress.firstOrNull()?.trimStart().orEmpty(),
+            city = dg11File.permanentAddress.getOrNull(2).orEmpty(),
+            postalCode = dg11File.permanentAddress.getOrNull(1).orEmpty(),
+            country = dg11File.permanentAddress.getOrNull(4).orEmpty(),
+            placeOfBirth = dg11File.placeOfBirth.joinToString(),
+            birthDate = dg1File.mrzInfo.dateOfBirth.toSlashStringDate(forceDateInPast = true),
+            expirationDate = dg1File.mrzInfo.dateOfExpiry.toSlashStringDate(),
+            deliveryDate = dg12File.dateOfIssue.toSlashStringDate(pattern = "yyyyMMdd")
+        )
     }
 
     companion object {
-        private const val TAG = "ReadTask"
+        private const val TAG = "NFCDocument"
     }
 }
 
-fun performBAC(isoDep: IsoDep, bacKey: BACKeySpec): Boolean {
-    try {
-        isoDep.connect()
 
-        // Step 1: GET CHALLENGE
-        val getChallengeCommand = byteArrayOf(0x00, 0x84.toByte(), 0x00, 0x00, 0x00)
-        val challengeResponse = isoDep.transceive(getChallengeCommand)
+fun extractLastNames(input: String): String {
+    val parts = input.split("<<")
 
-        if (challengeResponse.isEmpty()) {
-            Log.e(TAG, "Failed to get challenge from the card")
-            return false
-        }
-
-        // Step 2: Compute challenge response
-        val computedResponse = computeChallengeResponse(challengeResponse, bacKey)
-
-        // Step 3: COMPUTE CHALLENGE
-        val computeChallengeCommand = byteArrayOf(
-            0x00, 0x82.toByte(), 0x00, 0x00, computedResponse.size.toByte()
-        ) + computedResponse
-
-        val computeResponse = isoDep.transceive(computeChallengeCommand)
-
-        // Check the response for success (implementation-specific)
-        val success = checkBACSuccess(computeResponse)
-        if (!success) {
-            Log.e(TAG, "BAC authentication failed")
-        }
-
-        return success
-
-    } catch (e: IOException) {
-        Log.e(TAG, "Error communicating with the card", e)
-        return false
-    } finally {
-        try {
-            isoDep.close()
-        } catch (e: IOException) {
-            Log.e(TAG, "Error closing ISO-DEP connection", e)
-        }
-    }
+    // Get the part after "<<", split by "<", filter out any empty parts, and join them with spaces
+    return parts.getOrNull(1)?.split("<")?.filter { it.isNotEmpty() }?.joinToString(" ") ?: ""
 }
-
-private fun computeChallengeResponse(challenge: ByteArray, bacKey: BACKeySpec): ByteArray {
-    // Implement the computation of the response using BAC key
-    // This typically involves cryptographic operations
-    // For simplicity, this is a placeholder
-    return ByteArray(0) // Replace with actual computation
-}
-
-private fun checkBACSuccess(response: ByteArray): Boolean {
-    // Implement checking of the BAC response
-    // This typically involves checking the response status word or data
-    return true // Replace with actual check
-}
-
-
 
 fun Gender.toLetter(): String {
     return when (this) {
