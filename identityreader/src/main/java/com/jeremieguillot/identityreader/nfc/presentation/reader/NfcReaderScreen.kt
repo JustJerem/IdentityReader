@@ -33,12 +33,15 @@ import com.jeremieguillot.identityreader.core.domain.util.Result
 import com.jeremieguillot.identityreader.nfc.data.NFCReader
 import com.jeremieguillot.identityreader.nfc.domain.NfcReaderStatus
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.ExpirationDialog
-import com.jeremieguillot.identityreader.nfc.presentation.reader.components.ReaderAnimation
+import com.jeremieguillot.identityreader.nfc.presentation.reader.components.RippleEffect
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.FlippableCard
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.getDescription
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.getTitle
 import com.jeremieguillot.identityreader.scan.presentation.processDocument
 import com.jeremieguillot.identityreader.scan.presentation.returnIdentityDocumentResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +49,7 @@ import com.jeremieguillot.identityreader.scan.presentation.returnIdentityDocumen
 fun NfcReaderScreen(dataDocument: DataDocument) {
 
     val context = LocalContext.current
+    val scope = CoroutineScope(Dispatchers.Default)
     val reader = remember { NFCReader(dataDocument) }
     val identityDocument =
         remember { mutableStateOf(IdentityDocument.toIdentityDocument(dataDocument)) }
@@ -69,34 +73,32 @@ fun NfcReaderScreen(dataDocument: DataDocument) {
         val listener = Consumer<Intent> { intent ->
             val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
             if (tag!!.techList.contains("android.nfc.tech.IsoDep")) {
-                when (val result = reader.onTagDiscovered(tag)) {
-                    is Result.Error -> {
-                        //what to do ?
-                    }
+                scope.launch {
+                    when (val result = reader.onTagDiscovered(tag)) {
+                        is Result.Error -> {
+                            //what to do ?
+                        }
 
-                    is Result.Success -> {
-                        identity = result.data
-                        processDocument(
-                            context = context,
-                            identity = identity,
-                            showDialog = { showExpirationDialog = true }
-                        )
+                        is Result.Success -> {
+                            identity = result.data
+                            processDocument(
+                                context = context,
+                                identity = identity,
+                                showDialog = { showExpirationDialog = true }
+                            )
+                        }
                     }
                 }
             } else {
                 Log.e("ERROR", "Error isoDep")
             }
-
         }
-        (context as ReaderActivity).addOnNewIntentListener(
-            listener
-        )
+        (context as ReaderActivity).addOnNewIntentListener(listener)
         onDispose { context.removeOnNewIntentListener(listener) }
     }
 
 
     Scaffold(modifier = Modifier.fillMaxSize()) {
-
         Box(
             modifier = Modifier
                 .padding(it)
@@ -109,12 +111,17 @@ fun NfcReaderScreen(dataDocument: DataDocument) {
                 identityDocument = identityDocument.value
             )
 
-            ReaderAnimation(status, Modifier.align(Alignment.Center))
+            RippleEffect(
+                status.color,
+                Modifier
+                    .align(Alignment.Center)
+                    .padding(top = 32.dp)
+            )
 
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp, start = 16.dp, end = 16.dp),
+                    .padding(bottom = 80.dp, start = 24.dp, end = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
