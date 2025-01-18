@@ -61,7 +61,7 @@ fun ScanScreen(navController: NavHostController) {
                 is Success -> {
                     val type = result.data.type
                     when (type) {
-                        DocumentType.PASSPORT, DocumentType.ID_CARD -> navController.navigate(
+                        DocumentType.PASSPORT, DocumentType.ID_CARD, DocumentType.RESIDENT_PERMIT -> navController.navigate(
                             Destination.ReaderScreen(result.data)
                         )
 
