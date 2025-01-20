@@ -54,7 +54,11 @@ class ReaderActivity : ComponentActivity() {
                     startDestination = Destination.ScannerScreen
                 ) {
                     composable<Destination.ScannerScreen> {
-                        ScanScreen(navController)
+                        ScanScreen(
+                            navigateToNfcReader = { dataDocument ->
+                                navController.navigate(Destination.ReaderScreen(dataDocument))
+                            }
+                        )
                     }
                     composable<Destination.ReaderScreen>(
                         typeMap = mapOf(

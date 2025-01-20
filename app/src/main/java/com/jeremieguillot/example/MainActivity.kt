@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import com.jeremieguillot.identityreader.ReaderActivity
 import com.jeremieguillot.identityreader.ReaderResult
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
@@ -59,7 +60,7 @@ class MainActivity : ComponentActivity() {
                     startForResult.launch(intent)
 
                 }) {
-                    Text(text = "Scanner une pièce d'identité")
+                    Text(text = stringResource(R.string.scan_doc))
                 }
 
                 DisplayIdentity(identity)

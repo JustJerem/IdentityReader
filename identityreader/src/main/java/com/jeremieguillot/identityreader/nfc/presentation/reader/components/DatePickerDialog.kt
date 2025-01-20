@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.jeremieguillot.identityreader.R
 import com.jeremieguillot.identityreader.core.domain.MRZ
-import com.jeremieguillot.identityreader.core.extension.fromDDMMYYYYtoDate
-import com.jeremieguillot.identityreader.core.extension.fromYYMMDDtoDate
-import com.jeremieguillot.identityreader.core.extension.toLocaleDateString
+import com.sncf.android.internal.identityreader.core.extension.fromDDMMYYYYtoDate
+import com.sncf.android.internal.identityreader.core.extension.fromYYMMDDtoDate
+import com.sncf.android.internal.identityreader.core.extension.toLocaleDateString
 import java.util.Calendar
 import java.util.Date
 
@@ -50,7 +50,7 @@ import java.util.Date
 fun ModifyMRZDialog(
     mrz: MRZ,
     onDismiss: () -> Unit,
-    onSave: (documentNumber: String, dateOfBirth: Date, dateOfExpiry: Date) -> Unit
+    onSave: (documentNumber: String, dateOfBirth: Date, dateOfExpiry: Date) -> Unit,
 ) {
     var documentNumber by remember { mutableStateOf(TextFieldValue(mrz.documentNumber)) }
     var dateOfBirth by remember { mutableStateOf(mrz.dateOfBirth.fromYYMMDDtoDate()) }
@@ -58,10 +58,10 @@ fun ModifyMRZDialog(
 
 
     var localTextValueDateOfBirth by remember {
-        mutableStateOf(TextFieldValue(dateOfBirth?.toLocaleDateString() ?: ""))
+        mutableStateOf(TextFieldValue(dateOfBirth?.toLocaleDateString().orEmpty()))
     }
     var localTextValueDateOfExpiry by remember {
-        mutableStateOf(TextFieldValue(dateOfExpiry?.toLocaleDateString() ?: ""))
+        mutableStateOf(TextFieldValue(dateOfExpiry?.toLocaleDateString().orEmpty()))
     }
 
     Dialog(onDismissRequest = { onDismiss() }) {
@@ -130,7 +130,7 @@ fun EditTextDatePicker(
     label: String,
     onDateSelected: (Date) -> Unit,
     value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit
+    onValueChange: (TextFieldValue) -> Unit,
 ) {
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -178,7 +178,7 @@ fun EditTextDatePicker(
 fun EditDatePickerDialog(
     initialSelectedDateMillis: Long,
     onDismissRequest: () -> Unit,
-    onDateSelected: (Long) -> Unit
+    onDateSelected: (Long) -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialSelectedDateMillis,

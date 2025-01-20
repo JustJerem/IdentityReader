@@ -1,6 +1,5 @@
 package com.jeremieguillot.identityreader.scan.data
 
-import android.util.Log
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -8,6 +7,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import timber.log.Timber
 
 class TextImageAnalyzer(val onSuccess: (List<Text.TextBlock>) -> Unit) : ImageAnalysis.Analyzer {
 
@@ -21,12 +21,12 @@ class TextImageAnalyzer(val onSuccess: (List<Text.TextBlock>) -> Unit) : ImageAn
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
                     val resultText = visionText.text
-                    Log.i("resultText", resultText)
+                    Timber.tag("resultText").i(resultText)
                     imageProxy.close()
                     onSuccess(visionText.textBlocks)
                 }
                 .addOnFailureListener { e ->
-                    Log.e("error", e.message ?: "null")
+                    Timber.tag("error").e(e)
                     imageProxy.close()
                 }
         }

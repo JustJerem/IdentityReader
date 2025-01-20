@@ -10,36 +10,46 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavHostController
 import com.jeremieguillot.identityreader.ReaderActivity
 import com.jeremieguillot.identityreader.ReaderResult
-import com.jeremieguillot.identityreader.core.domain.DocumentType
+import com.jeremieguillot.identityreader.core.domain.DataDocument
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument.Companion.toIdentityDocument
-import com.jeremieguillot.identityreader.core.presentation.Destination
+import com.jeremieguillot.identityreader.nfc.presentation.reader.components.ErrorDialog
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.ExpirationDialog
 import com.jeremieguillot.identityreader.scan.data.MRZRecognitionOCR
 import com.jeremieguillot.identityreader.scan.data.MRZResult.Failure
+import com.jeremieguillot.identityreader.scan.data.MRZResult.MRZError
 import com.jeremieguillot.identityreader.scan.data.MRZResult.Success
 import com.jeremieguillot.identityreader.scan.data.TextImageAnalyzer
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+import com.jeremieguillot.identityreader.scan.domain.DocumentValidityAnalyzer
+import com.jeremieguillot.identityreader.scan.domain.DocumentValidityIssue
 
 @Composable
-fun ScanScreen(navController: NavHostController) {
+fun ScanScreen(
+    navigateToNfcReader: (DataDocument) -> Unit
+) {
 
     val recognizer = remember { MRZRecognitionOCR() }
     val context = LocalContext.current
     var identity by remember { mutableStateOf<IdentityDocument?>(null) }
-
+    var errorCount by remember { mutableIntStateOf(0) }
     var showExpirationDialog by remember { mutableStateOf(false) }
+
+    ErrorDialog(
+        showDialog = errorCount > 5,
+        onDismiss = {
+            errorCount = 0
+            (context as ReaderActivity).finish()
+        }
+    )
 
     ExpirationDialog(
         showDialog = showExpirationDialog,
@@ -58,23 +68,26 @@ fun ScanScreen(navController: NavHostController) {
                 Failure -> {/*will retry automatically*/
                 }
 
+                MRZError -> {
+                    errorCount++
+                }
+
                 is Success -> {
                     val type = result.data.type
-                    when (type) {
-                        DocumentType.PASSPORT, DocumentType.ID_CARD, DocumentType.RESIDENT_PERMIT -> navController.navigate(
-                            Destination.ReaderScreen(result.data)
-                        )
-
+                    when {
+                        type.hasNfcChip() -> navigateToNfcReader(result.data)
                         else -> {
                             identity = toIdentityDocument(result.data)
                             processDocument(
                                 context = context,
                                 identity = identity,
-                                showDialog = { showExpirationDialog = true }
+                                showDialog = { showExpirationDialog = true },
                             )
                         }
                     }
                 }
+
+
             }
         }
         )
@@ -94,7 +107,8 @@ fun ScanScreen(navController: NavHostController) {
         OverlayScreen(
             Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(padding),
+            controller = controller
         ) {
             CameraPreview(
                 controller = controller, modifier = Modifier.fillMaxSize()
@@ -103,37 +117,42 @@ fun ScanScreen(navController: NavHostController) {
     }
 }
 
-fun processDocument(
+fun processNFCDocument(
     context: Context,
     identity: IdentityDocument?,
-    showDialog: () -> Unit
+    showDialog: () -> Unit,
+    showIrregularDataDialog: (List<DocumentValidityIssue>) -> Unit,
 ) {
-    identity?.let { document ->
-        if (expirationDateIsInThePast(document.expirationDate)) {
-            showDialog()
-        } else {
-            returnIdentityDocumentResult(context, document)
+    identity?.let { doc ->
+        val analyzer = DocumentValidityAnalyzer(doc)
+        val irregularities = analyzer.processIrregularities()
+
+        when {
+            analyzer.expirationDateIsInThePast() -> showDialog()
+            irregularities.isNotEmpty() && doc.type.hasNfcChip() -> showIrregularDataDialog(
+                irregularities
+            )
+
+            else -> returnIdentityDocumentResult(context, doc)
         }
     }
 }
 
-
-fun expirationDateIsInThePast(expirationDate: String): Boolean {
-    if (expirationDate.isBlank()) return true
-    return try {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        val expiration = LocalDate.parse(expirationDate, formatter)
-        expiration.isBefore(LocalDate.now())
-    } catch (e: DateTimeParseException) {
-        throw IllegalArgumentException("Invalid date format. Please use 'dd/MM/yyyy'.")
+fun processDocument(
+    context: Context,
+    identity: IdentityDocument?,
+    showDialog: () -> Unit,
+) = identity?.let { doc ->
+    if (DocumentValidityAnalyzer(doc).expirationDateIsInThePast()) {
+        showDialog()
+    } else {
+        returnIdentityDocumentResult(context, doc)
     }
 }
 
-
 fun returnIdentityDocumentResult(context: Context, doc: IdentityDocument) {
-    val resultIntent = Intent().apply {
-        putExtra(ReaderResult, doc)
+    (context as ReaderActivity).apply {
+        setResult(Activity.RESULT_OK, Intent().putExtra(ReaderResult, doc))
+        finish()
     }
-    (context as ReaderActivity).setResult(Activity.RESULT_OK, resultIntent)
-    context.finish()
 }

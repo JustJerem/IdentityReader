@@ -9,28 +9,21 @@ import androidx.compose.ui.res.stringResource
 import com.jeremieguillot.identityreader.R
 
 @Composable
-fun ExpirationDialog(
+fun ErrorDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
     onDismissRequest: () -> Unit = onDismiss,  // Optional parameter
-    title: String = stringResource(R.string.expired_document_title),
-    text: String = stringResource(R.string.expired_document_desc),
-    confirmButtonText: String = stringResource(R.string.yes),
-    dismissButtonText: String = stringResource(R.string.no),
+    title: String = stringResource(R.string.technical_error_title),
+    text: String = stringResource(R.string.technical_error_description),
+    dismissButtonText: String = stringResource(R.string.to_continue),
 ) {
     if (showDialog) {
         AlertDialog(
             containerColor = Color.White,
             onDismissRequest = onDismissRequest,
-            dismissButton = {
+            confirmButton = {
                 TextButton(onClick = onDismiss) {
                     Text(dismissButtonText)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = onConfirm) {
-                    Text(confirmButtonText)
                 }
             },
             title = {

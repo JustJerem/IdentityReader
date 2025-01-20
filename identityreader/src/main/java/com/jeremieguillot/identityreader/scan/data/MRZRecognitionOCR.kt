@@ -60,6 +60,7 @@ import java.util.Locale
 sealed class MRZResult {
     data class Success(val data: DataDocument) : MRZResult()
     data object Failure : MRZResult()
+    data object MRZError : MRZResult()
 }
 
 class MRZRecognitionOCR {

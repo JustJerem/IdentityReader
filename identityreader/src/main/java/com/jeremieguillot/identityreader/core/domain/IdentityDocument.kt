@@ -1,8 +1,8 @@
 package com.jeremieguillot.identityreader.core.domain
 
 import android.os.Parcelable
-import com.jeremieguillot.identityreader.core.extension.fromYYMMDDtoDate
-import com.jeremieguillot.identityreader.core.extension.toLocaleDateStringSeparated
+import com.sncf.android.internal.identityreader.core.extension.fromYYMMDDtoDate
+import com.sncf.android.internal.identityreader.core.extension.toLocaleDateStringSeparated
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
 
@@ -21,8 +21,8 @@ data class IdentityDocument(
     val placeOfBirth: String = "",
     val gender: String = "",
     val address: String = "",
-    val postalCode: String = "",
-    val city: String = "",
+    var zipCode: String = "",
+    var city: String = "",
     val country: String = "",
 ) : Parcelable {
     companion object {
@@ -32,18 +32,18 @@ data class IdentityDocument(
                 documentNumber = dataDocument.documentNumber,
                 issuingIsO3Country = Locale("", dataDocument.issuingCountry).isO3Country,
                 lastName = dataDocument.lastName,
-                firstName = dataDocument.firstName,// Missing data
+                firstName = dataDocument.firstName,
                 nationality = Locale("", dataDocument.nationality).country,
                 gender = dataDocument.sex,
                 placeOfBirth = "",
                 birthDate = dataDocument.dateOfBirth.fromYYMMDDtoDate()
-                    ?.toLocaleDateStringSeparated() ?: "",
+                    ?.toLocaleDateStringSeparated().orEmpty(),
                 expirationDate = dataDocument.dateOfExpiry.fromYYMMDDtoDate()
-                    ?.toLocaleDateStringSeparated() ?: "",
+                    ?.toLocaleDateStringSeparated().orEmpty(),
                 deliveryDate = dataDocument.deliveryDate.fromYYMMDDtoDate()
-                    ?.toLocaleDateStringSeparated() ?: "",
+                    ?.toLocaleDateStringSeparated().orEmpty(),
                 address = "",  // Missing data
-                postalCode = "",  // Missing data
+                zipCode = "",  // Missing data
                 city = "",
                 country = ""  // Missing data
             )

@@ -1,4 +1,22 @@
 <resources>
     <string name="app_name">Identity Reader</string>
+    <string name="scan_doc">Scan an ID document</string>
 
+    <string name="document_section">Document</string>
+    <string name="type_label">Type</string>
+    <string name="document_number_label">Document Number</string>
+    <string name="issuing_country_label">Issuing Country</string>
+    <string name="delivery_date_label">Delivery Date</string>
+    <string name="expiration_date_label">Expiration Date</string>
+
+    <string name="identity_section">Identity</string>
+    <string name="last_name_label">Last Name</string>
+    <string name="first_name_label">First Name</string>
+    <string name="birth_date_label">Birth Date</string>
+    <string name="nationality_label">Nationality</string>
+    <string name="gender_label">Gender</string>
+    <string name="address_label">Address</string>
+    <string name="postal_code_label">Postal Code</string>
+    <string name="city_label">City</string>
+    <string name="country_label">Country</string>
 </resources>

@@ -1,1 +1,32 @@
-/build
+# Android-specific
+*.iml
+.gradle/
+local.properties
+/.idea/
+.DS_Store
+/build/
+*/build/
+.cxx/
+*.apk
+*.keystore
+*.jks
+
+# OS-specific
+Thumbs.db
+*.swp
+*.swo
+*.DS_Store
+ehthumbs.db
+Icon?
+
+# Logs and databases
+*.log
+*.sqlite
+*.sqlite3
+*.tlog
+
+# JetBrains
+.idea/
+*.ipr
+*.iws
+*.bak

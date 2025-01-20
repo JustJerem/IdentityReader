@@ -2,11 +2,12 @@ package com.jeremieguillot.identityreader.scan.data
 
 import com.jeremieguillot.identityreader.core.domain.DataDocument
 import com.jeremieguillot.identityreader.core.domain.DocumentType
-import com.jeremieguillot.identityreader.core.domain.util.DataError
 import com.jeremieguillot.identityreader.core.domain.util.Result
+import com.sncf.android.internal.identityreader.core.domain.util.DataError
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class DocumentTypeIdentifier(private val fullRead: String) {
+class DocumentTypeIdentifier(fullRead: String) {
 
     //Matcher for identity card
     private val identityCardMatcher1 =
@@ -60,7 +61,9 @@ class DocumentTypeIdentifier(private val fullRead: String) {
     }
 
     private fun matchOldIdentityCard(): Boolean {
-        return oldIdentityCardMatcher1.find() && oldIdentityCardMatcher2.find()
+        val find = oldIdentityCardMatcher1.find()
+        val find2 = oldIdentityCardMatcher2.find()
+        return find && find2
     }
 
     private fun matchDrivingLicence(): Boolean {
@@ -74,65 +77,70 @@ class DocumentTypeIdentifier(private val fullRead: String) {
     private fun processOldIdentityCard(): MRZResult {
         return processDocument(
             type = DocumentType.OLD_ID_CARD,
-            issuingCountry = oldIdentityCardMatcher1.group(RegexPatterns.ISSUING_COUNTRY),
-            documentNumber = oldIdentityCardMatcher2.group(RegexPatterns.ISSUE_DATE) + oldIdentityCardMatcher2.group(
+            issuingCountry = oldIdentityCardMatcher1.groupOrBlank(RegexPatterns.ISSUING_COUNTRY),
+            documentNumber = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.ISSUE_DATE) + oldIdentityCardMatcher2.groupOrBlank(
                 RegexPatterns.DOCUMENT_NUMBER
             ),
-            checkDigitDocumentNumber = oldIdentityCardMatcher2.group(RegexPatterns.CHECK_DOCUMENT_NUMBER),
+            checkDigitDocumentNumber = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.CHECK_DOCUMENT_NUMBER),
             expirationDate = "",
-            dateOfBirth = oldIdentityCardMatcher2.group(RegexPatterns.BIRTH_DATE),
-            checkDigitDateOfBirth = oldIdentityCardMatcher2.group(RegexPatterns.CHECK_BIRTH_DATE), //hard coded because only working with France
-            deliveryDate = oldIdentityCardMatcher2.group(RegexPatterns.ISSUE_DATE) + "01",
-            firstName = oldIdentityCardMatcher2.group(RegexPatterns.FIRST_NAME),
-            lastName = oldIdentityCardMatcher1.group(RegexPatterns.LAST_NAME),
-            nationality = "FRA", //date only contains month and year, adding first day of month
-            sex = oldIdentityCardMatcher2.group(RegexPatterns.SEX),
+            dateOfBirth = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.BIRTH_DATE),
+            checkDigitDateOfBirth = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.CHECK_BIRTH_DATE), //date only contains month and year, adding first day of month
+            deliveryDate = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.ISSUE_DATE) + "01",
+            firstName = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.FIRST_NAME),
+            lastName = oldIdentityCardMatcher1.groupOrBlank(RegexPatterns.LAST_NAME),
+            nationality = "FRA",   //hard coded because only working with France
+            sex = oldIdentityCardMatcher2.groupOrBlank(RegexPatterns.SEX),
         )
     }
 
     private fun processPassport(): MRZResult {
         return processDocument(
             type = DocumentType.PASSPORT,
-            issuingCountry = passportMatcher1.group(RegexPatterns.ISSUING_COUNTRY),
-            documentNumber = passportMatcher2.group(RegexPatterns.DOCUMENT_NUMBER),
-            checkDigitDocumentNumber = passportMatcher2.group(RegexPatterns.CHECK_DOCUMENT_NUMBER),
-            expirationDate = passportMatcher2.group(RegexPatterns.EXPIRATION_DATE),
-            checkDigitExpirationDate = passportMatcher2.group(RegexPatterns.CHECK_EXPIRATION_DATE),
-            dateOfBirth = passportMatcher2.group(RegexPatterns.BIRTH_DATE),
-            checkDigitDateOfBirth = passportMatcher2.group(RegexPatterns.CHECK_BIRTH_DATE),
-            lastName = passportMatcher1.group(RegexPatterns.LAST_NAME),
-            nationality = passportMatcher2.group(RegexPatterns.NATIONALITY),
-            sex = passportMatcher2.group(RegexPatterns.SEX)
+            issuingCountry = passportMatcher1.groupOrBlank(RegexPatterns.ISSUING_COUNTRY),
+            documentNumber = passportMatcher2.groupOrBlank(RegexPatterns.DOCUMENT_NUMBER),
+            checkDigitDocumentNumber = passportMatcher2.groupOrBlank(RegexPatterns.CHECK_DOCUMENT_NUMBER),
+            expirationDate = passportMatcher2.groupOrBlank(RegexPatterns.EXPIRATION_DATE),
+            checkDigitExpirationDate = passportMatcher2.groupOrBlank(RegexPatterns.CHECK_EXPIRATION_DATE),
+            dateOfBirth = passportMatcher2.groupOrBlank(RegexPatterns.BIRTH_DATE),
+            checkDigitDateOfBirth = passportMatcher2.groupOrBlank(RegexPatterns.CHECK_BIRTH_DATE),
+            lastName = passportMatcher1.groupOrBlank(RegexPatterns.LAST_NAME),
+            firstName = passportMatcher1.groupOrBlank(RegexPatterns.FIRST_NAME),
+            nationality = passportMatcher2.groupOrBlank(RegexPatterns.NATIONALITY),
+            sex = passportMatcher2.groupOrBlank(RegexPatterns.SEX)
         )
     }
 
     private fun processIdentityCard(): MRZResult {
         return processDocument(
             type = DocumentType.ID_CARD,
-            issuingCountry = identityCardMatcher1.group(RegexPatterns.ISSUING_COUNTRY),
-            documentNumber = identityCardMatcher1.group(RegexPatterns.DOCUMENT_NUMBER),
-            checkDigitDocumentNumber = identityCardMatcher1.group(RegexPatterns.CHECK_DOCUMENT_NUMBER),
-            expirationDate = identityCardMatcher2.group(RegexPatterns.EXPIRATION_DATE),
-            checkDigitExpirationDate = identityCardMatcher2.group(RegexPatterns.CHECK_EXPIRATION_DATE),
-            dateOfBirth = identityCardMatcher2.group(RegexPatterns.BIRTH_DATE),
-            checkDigitDateOfBirth = identityCardMatcher2.group(RegexPatterns.CHECK_BIRTH_DATE),
-            lastName = identityCardMatcher3.group(RegexPatterns.LAST_NAME),
-            nationality = identityCardMatcher2.group(RegexPatterns.NATIONALITY),
-            sex = identityCardMatcher2.group(RegexPatterns.SEX)
+            issuingCountry = identityCardMatcher1.groupOrBlank(RegexPatterns.ISSUING_COUNTRY),
+            documentNumber = identityCardMatcher1.groupOrBlank(RegexPatterns.DOCUMENT_NUMBER),
+            checkDigitDocumentNumber = identityCardMatcher1.groupOrBlank(RegexPatterns.CHECK_DOCUMENT_NUMBER),
+            expirationDate = identityCardMatcher2.groupOrBlank(RegexPatterns.EXPIRATION_DATE),
+            checkDigitExpirationDate = identityCardMatcher2.groupOrBlank(RegexPatterns.CHECK_EXPIRATION_DATE),
+            dateOfBirth = identityCardMatcher2.groupOrBlank(RegexPatterns.BIRTH_DATE),
+            checkDigitDateOfBirth = identityCardMatcher2.groupOrBlank(RegexPatterns.CHECK_BIRTH_DATE),
+            lastName = identityCardMatcher3.groupOrBlank(RegexPatterns.LAST_NAME),
+            firstName = identityCardMatcher3.groupOrBlank(RegexPatterns.FIRST_NAME),
+            nationality = identityCardMatcher2.groupOrBlank(RegexPatterns.NATIONALITY),
+            sex = identityCardMatcher2.groupOrBlank(RegexPatterns.SEX)
         )
     }
 
     private fun processDrivingLicence(): MRZResult {
-        val checkDigit = drivingLicenceMatcher.group(RegexPatterns.CHECK_LINE).toInt()
-        return when (cleanDocumentNumber(fullRead, checkDigit)) {
-            is Result.Error -> MRZResult.Failure
+        val checkDigit =
+            drivingLicenceMatcher.groupOrBlank(RegexPatterns.CHECK_DOCUMENT_NUMBER).toInt()
+        val documentNumber =
+            drivingLicenceMatcher.groupOrBlank(RegexPatterns.DOCUMENT_NUMBER).toString()
+        return when (cleanDocumentNumber(documentNumber, checkDigit)) {
+            is Result.Error -> MRZResult.MRZError
             is Result.Success -> processDocument(
                 type = DocumentType.DRIVING_LICENCE,
-                issuingCountry = drivingLicenceMatcher.group(RegexPatterns.ISSUING_COUNTRY),
-                documentNumber = drivingLicenceMatcher.group(RegexPatterns.DOCUMENT_NUMBER),
-                checkDigitDocumentNumber = drivingLicenceMatcher.group(RegexPatterns.CHECK_DOCUMENT_NUMBER),
-                expirationDate = drivingLicenceMatcher.group(RegexPatterns.EXPIRATION_DATE),
-                lastName = drivingLicenceMatcher.group(RegexPatterns.LAST_NAME)
+                issuingCountry = drivingLicenceMatcher.groupOrBlank(RegexPatterns.ISSUING_COUNTRY),
+                documentNumber = drivingLicenceMatcher.groupOrBlank(RegexPatterns.DOCUMENT_NUMBER),
+                checkDigitDocumentNumber = drivingLicenceMatcher.groupOrBlank(RegexPatterns.CHECK_DOCUMENT_NUMBER),
+                expirationDate = drivingLicenceMatcher.groupOrBlank(RegexPatterns.EXPIRATION_DATE),
+                lastName = drivingLicenceMatcher.groupOrBlank(RegexPatterns.LAST_NAME),
             )
         }
     }
@@ -140,16 +148,17 @@ class DocumentTypeIdentifier(private val fullRead: String) {
     private fun processResidentPermit(): MRZResult {
         return processDocument(
             type = DocumentType.RESIDENT_PERMIT,
-            issuingCountry = residencePermitMatcher1.group(RegexPatterns.ISSUING_COUNTRY),
-            documentNumber = residencePermitMatcher1.group(RegexPatterns.DOCUMENT_NUMBER),
-            checkDigitDocumentNumber = residencePermitMatcher1.group(RegexPatterns.CHECK_DOCUMENT_NUMBER),
-            expirationDate = residencePermitMatcher2.group(RegexPatterns.EXPIRATION_DATE),
-            checkDigitExpirationDate = residencePermitMatcher2.group(RegexPatterns.CHECK_EXPIRATION_DATE),
-            dateOfBirth = residencePermitMatcher2.group(RegexPatterns.BIRTH_DATE),
-            checkDigitDateOfBirth = residencePermitMatcher2.group(RegexPatterns.CHECK_BIRTH_DATE),
-            lastName = residencePermitMatcher3.group(RegexPatterns.LAST_NAME),
-            nationality = residencePermitMatcher2.group(RegexPatterns.NATIONALITY),
-            sex = residencePermitMatcher2.group(RegexPatterns.SEX)
+            issuingCountry = residencePermitMatcher1.groupOrBlank(RegexPatterns.ISSUING_COUNTRY),
+            documentNumber = residencePermitMatcher1.groupOrBlank(RegexPatterns.DOCUMENT_NUMBER),
+            checkDigitDocumentNumber = residencePermitMatcher1.groupOrBlank(RegexPatterns.CHECK_DOCUMENT_NUMBER),
+            expirationDate = residencePermitMatcher2.groupOrBlank(RegexPatterns.EXPIRATION_DATE),
+            checkDigitExpirationDate = residencePermitMatcher2.groupOrBlank(RegexPatterns.CHECK_EXPIRATION_DATE),
+            dateOfBirth = residencePermitMatcher2.groupOrBlank(RegexPatterns.BIRTH_DATE),
+            checkDigitDateOfBirth = residencePermitMatcher2.groupOrBlank(RegexPatterns.CHECK_BIRTH_DATE),
+            lastName = residencePermitMatcher3.groupOrBlank(RegexPatterns.LAST_NAME),
+            firstName = residencePermitMatcher3.groupOrBlank(RegexPatterns.FIRST_NAME),
+            nationality = residencePermitMatcher2.groupOrBlank(RegexPatterns.NATIONALITY),
+            sex = residencePermitMatcher2.groupOrBlank(RegexPatterns.SEX)
         )
     }
 
@@ -174,17 +183,17 @@ class DocumentTypeIdentifier(private val fullRead: String) {
         )
         val resultDateOfBirth =
             when (val result = checkDocumentNumber(dateOfBirth, checkDigitDateOfBirth)) {
-                is Result.Error -> return MRZResult.Failure
+                is Result.Error -> return MRZResult.MRZError
                 is Result.Success -> result.data
             }
         val resultExpirationDate =
             when (val result = checkDocumentNumber(expirationDate, checkDigitExpirationDate)) {
-                is Result.Error -> return MRZResult.Failure
+                is Result.Error -> return MRZResult.MRZError
                 is Result.Success -> result.data
             }
 
         return when (localResult) {
-            is Result.Error -> MRZResult.Failure
+            is Result.Error -> MRZResult.MRZError
             is Result.Success -> MRZResult.Success(
                 DataDocument(
                     type = type,
@@ -192,10 +201,10 @@ class DocumentTypeIdentifier(private val fullRead: String) {
                     documentNumber = localResult.data,
                     nationality = nationality,
                     lastName = cleanCharacter(lastName),
+                    firstName = cleanCharacter(firstName),
                     dateOfBirth = cleanDigit(resultDateOfBirth),
                     dateOfExpiry = cleanDigit(resultExpirationDate),
                     sex = sex,
-                    firstName = firstName,
                     deliveryDate = deliveryDate
                 )
             )
@@ -204,7 +213,7 @@ class DocumentTypeIdentifier(private val fullRead: String) {
 
     private fun checkDocumentNumber(
         date: String,
-        checkDigit: String
+        checkDigit: String,
     ): Result<String, DataError.Local> {
         if (checkDigit.isBlank()) return Result.Success(date)
         return cleanDocumentNumber(
@@ -215,7 +224,7 @@ class DocumentTypeIdentifier(private val fullRead: String) {
 
     private fun cleanDocumentNumber(
         documentNumber: String,
-        checkDigit: Int
+        checkDigit: Int,
     ): Result<String, DataError.Local> {
         // Replace all 'O' with '0'
         val tempDocumentNumber = documentNumber.replace("O", "0")
@@ -327,8 +336,13 @@ class DocumentTypeIdentifier(private val fullRead: String) {
                 '0' -> "O"
                 '5' -> "S"
                 '6' -> "G"
+                '8' -> "B"
                 else -> char.toString() // If the character is not a digit, keep it unchanged
             }
         }.joinToString("")
     }
+}
+
+fun Matcher.groupOrBlank(name: String): String {
+    return this.group(name) ?: ""
 }

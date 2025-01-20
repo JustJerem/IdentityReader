@@ -5,6 +5,7 @@ package com.jeremieguillot.identityreader.nfc.data
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import com.jeremieguillot.identityreader.core.domain.DataDocument
+import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.core.domain.MRZ
 import com.jeremieguillot.identityreader.core.domain.util.Error
@@ -24,9 +25,12 @@ class NFCReader(dataDocument: DataDocument) {
     private val _status: MutableStateFlow<NfcReaderStatus> = MutableStateFlow(NfcReaderStatus.IDLE)
     val status: MutableStateFlow<NfcReaderStatus> = _status
 
-    suspend fun onTagDiscovered(tag: Tag?): Result<IdentityDocument, Error> {
+    suspend fun onTagDiscovered(
+        tag: Tag?,
+        documentType: DocumentType,
+    ): Result<IdentityDocument, Error> {
         _status.emit(NfcReaderStatus.CONNECTING)
-        val result = NFCDocument().startReadTask(IsoDep.get(tag), mrz)
+        val result = NFCDocument().startReadTask(IsoDep.get(tag), mrz, documentType)
         when (result) {
             is Result.Error -> _status.emit(NfcReaderStatus.ERROR)
             is Result.Success -> _status.emit(NfcReaderStatus.CONNECTED)

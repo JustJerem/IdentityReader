@@ -1,23 +1,19 @@
-package com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.passport
+package com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -28,47 +24,31 @@ import androidx.compose.ui.unit.sp
 import com.jeremieguillot.identityreader.R
 import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
-import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.AddressField
-import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.IdentityField
-import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.IdentityFieldFontSize
 
 @Composable
-fun PassportCard(
+fun FrontStayCard(
     modifier: Modifier = Modifier,
     identityDocument: IdentityDocument,
 ) {
-    ElevatedCard(
-        modifier = modifier
-            .height(IntrinsicSize.Min)
-            .fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
-        elevation = CardDefaults.elevatedCardElevation(2.dp),
-    ) {
-
+    IdentityCardHolder(modifier) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
                 Text(
-                    modifier = Modifier.weight(3f),
-                    text = stringResource(R.string.passport).uppercase(),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    text = stringResource(R.string.identity_card_title).uppercase(),
+                    fontWeight = FontWeight.Medium,
                     letterSpacing = 2.sp,
-                    color = Color.Red,
                 )
-                Row(
-                    modifier = Modifier
-                        .weight(7f)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IdentityField(stringResource(R.string.type), "P")
-                    IdentityField(
-                        stringResource(R.string.country_code),
-                        identityDocument.issuingIsO3Country
+                Box(
+                    Modifier.align(
+                        Alignment.TopStart
                     )
-                    IdentityField(
-                        stringResource(R.string.document_number),
-                        identityDocument.documentNumber
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Center),
+                        text = identityDocument.issuingIsO3Country.uppercase(),
+                        color = Color(0xFF003399),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
                     )
                 }
             }
@@ -102,91 +82,74 @@ fun PassportCard(
                     // Nationality, Gender, Birthdate Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        IdentityField(stringResource(R.string.gender), identityDocument.gender)
                         IdentityField(
                             stringResource(R.string.nationality),
                             identityDocument.nationality
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        IdentityField(stringResource(R.string.gender), identityDocument.gender)
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
                         IdentityField(
                             stringResource(R.string.birth_date),
                             identityDocument.birthDate
                         )
-                        IdentityField(
-                            stringResource(R.string.place_of_birth),
-                            identityDocument.placeOfBirth
-                        )
                     }
 
+                    // Document Number and Origin
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            IdentityField(
-                                stringResource(R.string.delivery_date),
-                                identityDocument.deliveryDate
-                            )
-                            IdentityField(
-                                stringResource(R.string.expiration_date),
-                                identityDocument.expirationDate
-                            )
-                        }
-
-                        AddressField(
-                            stringResource(R.string.address),
-                            listOf(
-                                identityDocument.address,
-                                "${identityDocument.zipCode} ${identityDocument.city}",
-                                identityDocument.country
-                            ),
-                            modifier = Modifier.padding(start = 8.dp)
+                        IdentityField(
+                            stringResource(R.string.permit_category),
+                            stringResource(R.string.permit_title)
+                        )
+                        IdentityField(
+                            stringResource(R.string.expiration_date_short),
+                            identityDocument.expirationDate
                         )
                     }
+
+                    DocumentField(
+                        stringResource(R.string.personal_number),
+                        identityDocument.documentNumber
+                    )
                 }
             }
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun IdentityCardPreview() {
+fun FrontStayCardPreview() {
     val document = IdentityDocument(
-        type = DocumentType.PASSPORT,
+        type = DocumentType.ID_CARD,
         documentNumber = "13A000026",
         issuingIsO3Country = "FRA",
         lastName = "Doe",
         firstName = "John, Peter, Maxwell",
-        nationality = "French",
+        nationality = "Francaise",
         gender = "M",
         birthDate = "03/04/1982",
         expirationDate = "23/12/2045",
         placeOfBirth = "Strasbourg",
-        address = "Boulevard du General de Gaule",
+        address = "Main Street",
         zipCode = "75001",
-        city = "Saint Romain en Provence",
+        city = "Paris",
         country = "France"
     )
 
     Column(modifier = Modifier.padding(16.dp)) {
-        PassportCard(identityDocument = document)
+        FrontStayCard(identityDocument = document)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun IdentityCardPreviewWithMissingData() {
+fun FrontStayCardPreviewWithMissingData() {
     val document = IdentityDocument(
-        type = DocumentType.PASSPORT,
+        type = DocumentType.ID_CARD,
         documentNumber = "13A000026",
         issuingIsO3Country = "FRA",
         lastName = "Doe",
@@ -202,6 +165,6 @@ fun IdentityCardPreviewWithMissingData() {
         country = ""  // Missing data
     )
     Column(modifier = Modifier.padding(16.dp)) {
-        PassportCard(identityDocument = document)
+        FrontStayCard(identityDocument = document)
     }
 }

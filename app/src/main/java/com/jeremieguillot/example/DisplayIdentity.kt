@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
@@ -14,28 +15,49 @@ import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 fun DisplayIdentity(identity: IdentityDocument?) {
     if (identity != null) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Document", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.document_section), fontWeight = FontWeight.Bold)
 
-            DisplayRow(label = "Type", value = identity.type.name)
-            DisplayRow(label = "Document Number", value = identity.documentNumber)
-            DisplayRow(label = "Issuing Country", value = identity.issuingIsO3Country)
-            DisplayRow(label = "Delivery Date", value = identity.deliveryDate)
-            DisplayRow(label = "Expiration Date", value = identity.expirationDate)
+            DisplayRow(label = stringResource(R.string.type_label), value = identity.type.name)
+            DisplayRow(
+                label = stringResource(R.string.document_number_label),
+                value = identity.documentNumber
+            )
+            DisplayRow(
+                label = stringResource(R.string.issuing_country_label),
+                value = identity.issuingIsO3Country
+            )
+            DisplayRow(
+                label = stringResource(R.string.delivery_date_label),
+                value = identity.deliveryDate
+            )
+            DisplayRow(
+                label = stringResource(R.string.expiration_date_label),
+                value = identity.expirationDate
+            )
 
-            Text(text = " ")
-            Text(text = " ")
-            Text(text = "Identité", fontWeight = FontWeight.Bold)
+            Text(
+                text = stringResource(R.string.identity_section), fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 16.dp)
+            )
 
-            DisplayRow(label = "Last Name", value = identity.lastName)
-            DisplayRow(label = "First Name", value = identity.firstName)
-            DisplayRow(label = "Birth Date", value = identity.birthDate)
-            DisplayRow(label = "Nationality", value = identity.nationality)
-            DisplayRow(label = "Gender", value = identity.gender)
-            // DisplayRow(label = "Address Number", value = identity.addressNumber)
-            DisplayRow(label = "Address", value = identity.address)
-            DisplayRow(label = "Postal Code", value = identity.postalCode)
-            DisplayRow(label = "City", value = identity.city)
-            DisplayRow(label = "Country", value = identity.country)
+            DisplayRow(label = stringResource(R.string.last_name_label), value = identity.lastName)
+            DisplayRow(
+                label = stringResource(R.string.first_name_label),
+                value = identity.firstName
+            )
+            DisplayRow(
+                label = stringResource(R.string.birth_date_label),
+                value = identity.birthDate
+            )
+            DisplayRow(
+                label = stringResource(R.string.nationality_label),
+                value = identity.nationality
+            )
+            DisplayRow(label = stringResource(R.string.gender_label), value = identity.gender)
+            DisplayRow(label = stringResource(R.string.address_label), value = identity.address)
+            DisplayRow(label = stringResource(R.string.postal_code_label), value = identity.zipCode)
+            DisplayRow(label = stringResource(R.string.city_label), value = identity.city)
+            DisplayRow(label = stringResource(R.string.country_label), value = identity.country)
         }
     }
 }

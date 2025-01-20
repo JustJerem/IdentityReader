@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.jakewharton.timber)
 
     //UI
     implementation(platform(libs.androidx.compose.bom))
@@ -63,6 +64,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.material.icons.extended)
 
     //Camera
     implementation(libs.androidx.camera.view)
