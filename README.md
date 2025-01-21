@@ -17,7 +17,7 @@ Application for ID scanner document. MVI, multi-module & Clean Architecture.
 
 ## Screen Flow
 
-![](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Flow.jpg)
+![](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Flow2.jpg)
 
 ## Architecture Overview
 
