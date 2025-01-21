@@ -1,6 +1,6 @@
-# Paris 2024
+# Identity Reader
 
-Application for ID scanner document. Clean Architecture & MVI.
+Application for ID scanner document. MVI, multi-module & Clean Architecture.
 
 *
 * Internationalized for English, Spanish and French
@@ -10,10 +10,18 @@ Application for ID scanner document. Clean Architecture & MVI.
 
 ## Screen Shots
 
-[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png" width=250 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png)
-[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_2.png" width=250 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_2.png)
-[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_3.png" width=250 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_3.png)
-[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_4.png" width=250 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_4.png)
+[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png)
+[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_2.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_2.png)
+[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_3.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_3.png)
+[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_4.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_4.png)
+
+## Screen Flow
+
+![](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Flow.jpg)
+
+## Architecture Overview
+
+## Architecture Data Flow
 
 ## 🛠 Built With
 
@@ -36,37 +44,37 @@ Application for ID scanner document. Clean Architecture & MVI.
   Jetpack Compose dependencies.
 - [Compose UI](https://developer.android.com/jetpack/compose/ui) - Toolkit for building declarative
   UI in Android.
-    - [UI Graphics](https://developer.android.com/jetpack/compose/ui) - Library for managing Compose
-      graphics.
-    - [UI Tooling](https://developer.android.com/jetpack/compose/tooling) - Tools for UI previews
-      and debugging.
-    - [UI Tooling Preview](https://developer.android.com/jetpack/compose/tooling) - Preview and
-      inspect UI directly in the IDE.
-    - [UI Test Manifest](https://developer.android.com/jetpack/compose/testing) - Simplifies testing
-      Compose UI components.
-    - [UI Test JUnit4](https://developer.android.com/jetpack/compose/testing) - Compose UI testing
-      with JUnit4.
+  - [UI Graphics](https://developer.android.com/jetpack/compose/ui) - Library for managing Compose
+    graphics.
+  - [UI Tooling](https://developer.android.com/jetpack/compose/tooling) - Tools for UI previews
+    and debugging.
+  - [UI Tooling Preview](https://developer.android.com/jetpack/compose/tooling) - Preview and
+    inspect UI directly in the IDE.
+  - [UI Test Manifest](https://developer.android.com/jetpack/compose/testing) - Simplifies testing
+    Compose UI components.
+  - [UI Test JUnit4](https://developer.android.com/jetpack/compose/testing) - Compose UI testing
+    with JUnit4.
 - [CameraX](https://developer.android.com/training/camerax) - Camera library for simplified camera
   app development.
-    - [Camera View](https://developer.android.com/training/camerax) - Provides a simple API for
-      camera previews.
-    - [Camera Core](https://developer.android.com/training/camerax) - Core functionality for camera
-      features.
-    - [Camera2](https://developer.android.com/training/camerax) - Backward compatibility with
-      Camera2 API.
-    - [Camera Lifecycle](https://developer.android.com/training/camerax) - Lifecycle-aware
-      components for cameras.
-    - [Camera Video](https://developer.android.com/training/camerax) - Video recording support for
-      CameraX.
-    - [Camera Extensions](https://developer.android.com/training/camerax) - Enhances camera
-      capabilities with effects.
+  - [Camera View](https://developer.android.com/training/camerax) - Provides a simple API for
+    camera previews.
+  - [Camera Core](https://developer.android.com/training/camerax) - Core functionality for camera
+    features.
+  - [Camera2](https://developer.android.com/training/camerax) - Backward compatibility with
+    Camera2 API.
+  - [Camera Lifecycle](https://developer.android.com/training/camerax) - Lifecycle-aware
+    components for cameras.
+  - [Camera Video](https://developer.android.com/training/camerax) - Video recording support for
+    CameraX.
+  - [Camera Extensions](https://developer.android.com/training/camerax) - Enhances camera
+    capabilities with effects.
 - [ML Kit Text Recognition](https://developers.google.com/ml-kit/vision/text-recognition) - Machine
   learning for recognizing text in images.
 - [MockK](https://mockk.io/) - Kotlin mocking framework for testing.
 - [Passport Analyzer (JMRTD)](https://github.com/eaubrey/jmrtd) - Library for reading
   machine-readable travel documents.
-    - [Spongy Castle](https://rtyley.github.io/spongycastle/) - Cryptography API for Android.
-    - [Scuba SC Android](https://sourceforge.net/projects/scuba/) - Tools for handling smart cards.
+  - [Spongy Castle](https://rtyley.github.io/spongycastle/) - Cryptography API for Android.
+  - [Scuba SC Android](https://sourceforge.net/projects/scuba/) - Tools for handling smart cards.
 - [Navigation Compose](https://developer.android.com/jetpack/compose/navigation) - Simplifies and
   type-safe navigation in Compose.
 - [Kotlin Serialization JSON](https://github.com/Kotlin/kotlinx.serialization) - Library for JSON
@@ -75,10 +83,4 @@ Application for ID scanner document. Clean Architecture & MVI.
 - [Material 3](https://m3.material.io/) - Modern Material Design components for expressive UIs.
 - [Google Truth](https://truth.dev/) - Fluent assertion framework for testing.
 - [JUnit JUnit](https://junit.org/junit4/) - A robust Java testing framework.
-
-## Screen Flow
-
-## Architecture Overview
-
-## Architecture Data Flow
 
