@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lector de Identidad</string>
+    <string name="scan_doc">Escanear un documento de identidad</string>
+    <string name="no_identity_available">No hay información de identidad disponible.</string>
+
+    <string name="document_section">Documento</string>
+    <string name="type_label">Tipo</string>
+    <string name="document_number_label">Número de Documento</string>
+    <string name="issuing_country_label">País Emisor</string>
+    <string name="delivery_date_label">Fecha de Emisión</string>
+    <string name="expiration_date_label">Fecha de Expiración</string>
+
+    <string name="identity_section">Identidad</string>
+    <string name="last_name_label">Apellido</string>
+    <string name="first_name_label">Nombre</string>
+    <string name="birth_date_label">Fecha de Nacimiento</string>
+    <string name="nationality_label">Nacionalidad</string>
+    <string name="gender_label">Género</string>
+    <string name="address_label">Dirección</string>
+    <string name="postal_code_label">Código Postal</string>
+    <string name="city_label">Ciudad</string>
+    <string name="country_label">País</string>
+</resources>
