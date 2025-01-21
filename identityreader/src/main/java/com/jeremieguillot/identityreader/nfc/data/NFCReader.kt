@@ -8,6 +8,7 @@ import com.jeremieguillot.identityreader.core.domain.DataDocument
 import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.core.domain.MRZ
+import com.jeremieguillot.identityreader.core.domain.util.DataError
 import com.jeremieguillot.identityreader.core.domain.util.Error
 import com.jeremieguillot.identityreader.core.domain.util.Result
 import com.jeremieguillot.identityreader.nfc.domain.NfcReaderStatus
@@ -27,8 +28,13 @@ class NFCReader(dataDocument: DataDocument) {
 
     suspend fun onTagDiscovered(
         tag: Tag?,
-        documentType: DocumentType,
+        documentType: DocumentType
     ): Result<IdentityDocument, Error> {
+        if (tag == null) {
+            _status.emit(NfcReaderStatus.ERROR)
+            return Result.Error(DataError.Local.INVALID_DATA)
+        }
+
         _status.emit(NfcReaderStatus.CONNECTING)
         val result = NFCDocument().startReadTask(IsoDep.get(tag), mrz, documentType)
         when (result) {

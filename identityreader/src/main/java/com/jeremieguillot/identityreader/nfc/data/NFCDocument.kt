@@ -4,9 +4,9 @@ import android.nfc.tech.IsoDep
 import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.core.domain.MRZ
+import com.jeremieguillot.identityreader.core.domain.util.DataError
 import com.jeremieguillot.identityreader.core.domain.util.Error
 import com.jeremieguillot.identityreader.core.domain.util.Result
-import com.sncf.android.internal.identityreader.core.domain.util.DataError
 import net.sf.scuba.smartcards.CardService
 import org.jmrtd.BACKey
 import org.jmrtd.BACKeySpec
@@ -18,8 +18,11 @@ import timber.log.Timber
 
 
 class NFCDocument {
+
+    private val TAG = "NFCDocument"
+
     companion object {
-        private const val TAG = "NFCDocument"
+        const val DEFAULT_MAX_BLOCK_SIZE = 256
     }
 
     fun startReadTask(
@@ -80,14 +83,15 @@ class NFCDocument {
     // Attempts to perform PACE and returns whether it succeeded
     private fun performPace(passportService: PassportService, paceKey: PACEKeySpec): Boolean {
         return runCatching {
-            passportService.getInputStream(PassportService.EF_CARD_ACCESS).use { stream ->
-                val paceInfo = CardAccessFile(stream).securityInfos
-                    .filterIsInstance<PACEInfo>()
-                    .firstOrNull() ?: throw IllegalArgumentException("PACEInfo not found")
+            passportService.getInputStream(PassportService.EF_CARD_ACCESS, DEFAULT_MAX_BLOCK_SIZE)
+                .use { stream ->
+                    val paceInfo = CardAccessFile(stream).securityInfos
+                        .filterIsInstance<PACEInfo>()
+                        .firstOrNull() ?: throw IllegalArgumentException("PACEInfo not found")
 
-                val parameterSpec = PACEInfo.toParameterSpec(paceInfo.parameterId)
-                passportService.doPACE(paceKey, paceInfo.objectIdentifier, parameterSpec)
-            }
+                    val parameterSpec = PACEInfo.toParameterSpec(paceInfo.parameterId)
+                    passportService.doPACE(paceKey, paceInfo.objectIdentifier, parameterSpec, null)
+                }
             true
         }.onFailure { exception ->
             Timber.tag(TAG).w(exception, "PACE failed: %s", exception.message)
@@ -97,7 +101,7 @@ class NFCDocument {
     // Fallback to BAC if PACE fails
     private fun performBacFallback(passportService: PassportService, bacKey: BACKeySpec) {
         try {
-            passportService.getInputStream(PassportService.EF_COM).read()
+            passportService.getInputStream(PassportService.EF_COM, DEFAULT_MAX_BLOCK_SIZE).read()
         } catch (e: Exception) {
             passportService.doBAC(bacKey)
         }

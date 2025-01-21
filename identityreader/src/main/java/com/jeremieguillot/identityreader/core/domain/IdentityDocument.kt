@@ -1,8 +1,8 @@
 package com.jeremieguillot.identityreader.core.domain
 
 import android.os.Parcelable
-import com.sncf.android.internal.identityreader.core.extension.fromYYMMDDtoDate
-import com.sncf.android.internal.identityreader.core.extension.toLocaleDateStringSeparated
+import com.jeremieguillot.identityreader.core.extension.fromYYMMDDtoDate
+import com.jeremieguillot.identityreader.core.extension.toLocaleDateStringSeparated
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
 

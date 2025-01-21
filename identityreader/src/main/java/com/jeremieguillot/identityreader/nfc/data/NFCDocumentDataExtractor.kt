@@ -2,7 +2,7 @@ package com.jeremieguillot.identityreader.nfc.data
 
 import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
-import com.sncf.android.internal.identityreader.core.extension.toSlashStringDate
+import com.jeremieguillot.identityreader.core.extension.toSlashStringDate
 import net.sf.scuba.data.Gender
 import org.jmrtd.PassportService
 import org.jmrtd.lds.icao.DG11File
@@ -18,9 +18,24 @@ class NFCDocumentDataExtractor {
         passportService: PassportService,
         documentType: DocumentType,
     ): IdentityDocument {
-        val dg1File = DG1File(passportService.getInputStream(PassportService.EF_DG1))
-        val dg11File = DG11File(passportService.getInputStream(PassportService.EF_DG11))
-        val dg12File = DG12File(passportService.getInputStream(PassportService.EF_DG12))
+        val dg1File = DG1File(
+            passportService.getInputStream(
+                PassportService.EF_DG1,
+                NFCDocument.DEFAULT_MAX_BLOCK_SIZE
+            )
+        )
+        val dg11File = DG11File(
+            passportService.getInputStream(
+                PassportService.EF_DG11,
+                NFCDocument.DEFAULT_MAX_BLOCK_SIZE
+            )
+        )
+        val dg12File = DG12File(
+            passportService.getInputStream(
+                PassportService.EF_DG12,
+                NFCDocument.DEFAULT_MAX_BLOCK_SIZE
+            )
+        )
 
         return when (documentType) {
             DocumentType.RESIDENT_PERMIT -> extractResidentPermit(dg1File, dg11File, dg12File)
@@ -53,8 +68,6 @@ class NFCDocumentDataExtractor {
         )
     }
 
-
-    //To better understand the Resident Permit / Stay Card logic, please see : https://jira.apps.eul.sncf.fr/browse/MOBIG-504
     private fun extractResidentPermit(
         dg1File: DG1File,
         dg11File: DG11File,
@@ -115,7 +128,7 @@ class NFCDocumentDataExtractor {
     private fun extractLastNames(input: String): String {
         val parts = input.split("<<")
 
-        // Get the part after "<<", split by "<", filter out any empty parts, and join them with spaces
+        // Get the part after "<<", split by "<", filter out any empty parts, and join names with spaces
         return parts.getOrNull(1)?.split("<")?.filter { it.isNotEmpty() }?.joinToString(" ") ?: ""
     }
 

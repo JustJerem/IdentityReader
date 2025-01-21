@@ -2,8 +2,8 @@ package com.jeremieguillot.identityreader.scan.data
 
 import com.jeremieguillot.identityreader.core.domain.DataDocument
 import com.jeremieguillot.identityreader.core.domain.DocumentType
+import com.jeremieguillot.identityreader.core.domain.util.DataError
 import com.jeremieguillot.identityreader.core.domain.util.Result
-import com.sncf.android.internal.identityreader.core.domain.util.DataError
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 

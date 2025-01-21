@@ -1,4 +1,4 @@
-package com.sncf.android.internal.identityreader.core.extension
+package com.jeremieguillot.identityreader.core.extension
 
 import java.text.SimpleDateFormat
 import java.time.LocalDate

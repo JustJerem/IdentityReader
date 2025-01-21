@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.jeremieguillot.identityreader.R
 import com.jeremieguillot.identityreader.core.domain.MRZ
-import com.sncf.android.internal.identityreader.core.extension.fromDDMMYYYYtoDate
-import com.sncf.android.internal.identityreader.core.extension.fromYYMMDDtoDate
-import com.sncf.android.internal.identityreader.core.extension.toLocaleDateString
+import com.jeremieguillot.identityreader.core.extension.fromDDMMYYYYtoDate
+import com.jeremieguillot.identityreader.core.extension.fromYYMMDDtoDate
+import com.jeremieguillot.identityreader.core.extension.toLocaleDateString
 import java.util.Calendar
 import java.util.Date
 

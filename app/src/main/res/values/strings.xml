@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Identity Reader</string>
     <string name="scan_doc">Scan an ID document</string>
+    <string name="no_identity_available">No identity information available.</string>
 
     <string name="document_section">Document</string>
     <string name="type_label">Type</string>
