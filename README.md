@@ -33,14 +33,7 @@ architecture**, and **Clean Architecture principles** for scalability and mainta
 
 ## Video
 
-```html
-
-<video width="100%" controls>
-  <source src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/video.mp4"
-          type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-```
+https://github.com/user-attachments/assets/7638267c-13d9-481b-a569-f7648fa6920c
 
 ## Screen Shots
 
