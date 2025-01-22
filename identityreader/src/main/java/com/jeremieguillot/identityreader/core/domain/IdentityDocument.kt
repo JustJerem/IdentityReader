@@ -50,10 +50,3 @@ data class IdentityDocument(
         }
     }
 }
-
-fun Int.toHumanReadableHeight(): String {
-    if (this == 0) return ""
-    val meters = this / 100
-    val centimeters = this % 100
-    return "${meters},${centimeters}m"
-}

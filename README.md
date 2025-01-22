@@ -10,14 +10,14 @@ Application for ID scanner document. MVI, multi-module & Clean Architecture.
 
 ## Screen Shots
 
+[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_0.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png)
 [<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_1.png)
 [<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_2.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_2.png)
-[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_3.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_3.png)
 [<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_4.png" width=200 />](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Screenshot_4.png)
 
 ## Screen Flow
 
-![](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Flow2.jpg)
+![](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Flow4.jpg)
 
 ## Architecture Overview
 
