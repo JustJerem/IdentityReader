@@ -33,7 +33,7 @@ architecture**, and **Clean Architecture principles** for scalability and mainta
 
 ## Video
 
-https://github.com/JustJerem/OlympicGame/IdentityReader/master/documentation/video.mp4
+https://github.com/JustJerem/IdentityReader/master/documentation/video.mp4
 
 ## Screen Shots
 
