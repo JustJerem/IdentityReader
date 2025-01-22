@@ -2,6 +2,7 @@ package com.jeremieguillot.identityreader.scan.data
 
 import com.google.mlkit.vision.text.Text
 import com.jeremieguillot.identityreader.core.domain.DataDocument
+import com.jeremieguillot.identityreader.scan.domain.DocumentTypeIdentifier
 import java.util.Locale
 
 
@@ -60,6 +61,7 @@ import java.util.Locale
 sealed class MRZResult {
     data class Success(val data: DataDocument) : MRZResult()
     data object Failure : MRZResult()
+    data object MRZError : MRZResult()
 }
 
 class MRZRecognitionOCR {

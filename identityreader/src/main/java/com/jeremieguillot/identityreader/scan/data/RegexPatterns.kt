@@ -63,32 +63,33 @@ object RegexPatterns {
 
     //Regex for PASSPORT
     const val REGEX_PASSPORT_FIRST_LINE =
-        "P<(?<$ISSUING_COUNTRY>[A-Z<]{3})(?<$LAST_NAME>[A-Z]{2,})<<([A-Z]+)"
+        "P<(?<$ISSUING_COUNTRY>[A-Z]{3})(?<$LAST_NAME>[A-Z]{2,})<<(?<$FIRST_NAME>[A-Z]{2,})<"
     const val REGEX_PASSPORT =
-        "(?<$DOCUMENT_NUMBER>[A-Z0-9<]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9ILDSOG]{1})(?<nationality>[A-Z<]{3})(?<$BIRTH_DATE>[0-9ILDSOG]{6})(?<$CHECK_BIRTH_DATE>[0-9ILDSOG]{1})(?<sex>[FM<]){1}(?<$EXPIRATION_DATE>[0-9ILDSOG]{6})(?<$CHECK_EXPIRATION_DATE>[0-9ILDSOG]{1})"
+        "(?<$DOCUMENT_NUMBER>[A-Z0-9<]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9I]{1})(?<$NATIONALITY>[A-Z<]{3})(?<$BIRTH_DATE>[0-9I]{6})(?<$CHECK_BIRTH_DATE>[0-9]{1})(?<$SEX>[FM]){1}(?<$EXPIRATION_DATE>[0-9I]{6})(?<$CHECK_EXPIRATION_DATE>[0-9I]{1})"
 
 
     //Regex for IDENTITY CARD
     const val REGEX_NEW_CARD_LINE_1 =
-        "ID(?<$ISSUING_COUNTRY>[A-Z<]{3})(?<$DOCUMENT_NUMBER>[A-Z0-9<]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9]{1})"
+        "ID(?<$ISSUING_COUNTRY>[A-Z]{3})(?<$DOCUMENT_NUMBER>[A-Z0-9<]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9]{1})"
     const val REGEX_NEW_CARD_LINE_2 =
         "(?<$BIRTH_DATE>[0-9]{6})(?<$CHECK_BIRTH_DATE>[0-9]{1})(?<$SEX>[FM]{1})(?<$EXPIRATION_DATE>[0-9]{6})(?<$CHECK_EXPIRATION_DATE>[0-9]{1})(?<$NATIONALITY>[A-Z<]{3})"
-    const val REGEX_NEW_CARD_LINE_3 = "(?<$LAST_NAME>[A-Z]{2,})<<([A-Z]+)"
+    const val REGEX_NEW_CARD_LINE_3 = "(?<$LAST_NAME>[A-Z]{2,})<<(?<$FIRST_NAME>[A-Z]{2,})<"
 
     //Regex for OLD IDENTITY CARD
     const val REGEX_OLD_FRENCH_CARD_ID = "ID(?<$ISSUING_COUNTRY>[A-Z]{3})(?<$LAST_NAME>[A-Z]{2,})<"
     const val REGEX_OLD_FRENCH_CARD_ID_2 =
-        "(?<$ISSUE_DATE>[0-9]{4})(?<$DOCUMENT_NUMBER>[0-9]{8})(?<$CHECK_DOCUMENT_NUMBER>[0-9])(?<$FIRST_NAME>[A-Z]{2,})<<[A-Z0-9]{2,}<(?<$BIRTH_DATE>[0-9]{6})(?<$CHECK_BIRTH_DATE>[0-9])(?<$SEX>[FM])"
+        "(?<$ISSUE_DATE>[0-9]{4})(?<$DOCUMENT_NUMBER>[0-9]{8})(?<$CHECK_DOCUMENT_NUMBER>[0-9]{1})(?<$FIRST_NAME>[A-Z]{2,})<<[A-Z0-9<]{2,}(?<$BIRTH_DATE>[0-9]{6})(?<$CHECK_BIRTH_DATE>[0-9])(?<$SEX>[FM])"
 
     //Regex for DRIVING LICENCE
     const val REGEX_DRIVING_LICENCE =
-        "D1(?<$ISSUING_COUNTRY>[A-Z]{3})(?<$DOCUMENT_NUMBER>[A-Z0-9<]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9]{1})(?<$EXPIRATION_DATE>[0-9]{6})(?<$LAST_NAME>[A-Z]{2,})<{1,}(?<$CHECK_LINE>[0-9]{1})"
+        "D1(?<$ISSUING_COUNTRY>[A-Z]{3})(?<$DOCUMENT_NUMBER>[A-Z0-9]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9]{1})(?<$EXPIRATION_DATE>[0-9]{6})(?<$LAST_NAME>[A-Z]{2,})[A-Z<]{0,}(?<$CHECK_LINE>[0-9]{1})"
 
+    //D1(?<ISSUING_COUNTRY>[A-Z]{3})(?<DOCUMENT_NUMBER>[A-Z0-9]{9})(?<CHECK_DOCUMENT_NUMBER>[0-9])(?<EXPIRATION_DATE>[0-9]{6})(?<LAST_NAME>[A-Z]{2,})[A-Z<]{0,}(?<CHECK_LINE>[0-9]{1})
     //Regex for RESIDENCE PERMIT
     const val REGEX_RESIDENCE_PERMIT_1 =
         "IR(?<$ISSUING_COUNTRY>[A-Z]{3})(?<$DOCUMENT_NUMBER>[A-Z0-9<]{9})(?<$CHECK_DOCUMENT_NUMBER>[0-9]{1})<"
     const val REGEX_RESIDENCE_PERMIT_2 =
         "(?<$BIRTH_DATE>[0-9]{6})(?<$CHECK_BIRTH_DATE>[0-9]{1})(?<$SEX>[FM]{1})(?<$EXPIRATION_DATE>[0-9]{6})(?<$CHECK_EXPIRATION_DATE>[0-9]{1})(?<$NATIONALITY>[A-Z<]{3})<{1,}(?<$CHECK_LINE>[0-9]{1})"
-    const val REGEX_RESIDENCE_PERMIT_3 = "(?<$LAST_NAME>[A-Z]{2,})<<([A-Z]+)"
+    const val REGEX_RESIDENCE_PERMIT_3 = "(?<$LAST_NAME>[A-Z]{2,})<<(?<$FIRST_NAME>[A-Z]{2,})<"
 
 }

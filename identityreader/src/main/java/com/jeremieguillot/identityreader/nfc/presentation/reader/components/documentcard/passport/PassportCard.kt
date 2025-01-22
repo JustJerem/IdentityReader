@@ -20,10 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jeremieguillot.identityreader.R
 import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.AddressField
@@ -39,7 +41,6 @@ fun PassportCard(
         modifier = modifier
             .height(IntrinsicSize.Min)
             .fillMaxWidth(),
-//            .aspectRatio(1.585f),
         colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
         elevation = CardDefaults.elevatedCardElevation(2.dp),
     ) {
@@ -48,7 +49,7 @@ fun PassportCard(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     modifier = Modifier.weight(3f),
-                    text = "Passeport".uppercase(),
+                    text = stringResource(R.string.passport).uppercase(),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 2.sp,
@@ -60,20 +61,16 @@ fun PassportCard(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IdentityField("Type", "P")
-                    IdentityField("Code du pays", identityDocument.issuingIsO3Country)
-                    IdentityField("N° DU DOCUMENT", identityDocument.documentNumber)
-
+                    IdentityField(stringResource(R.string.type), "P")
+                    IdentityField(
+                        stringResource(R.string.country_code),
+                        identityDocument.issuingIsO3Country
+                    )
+                    IdentityField(
+                        stringResource(R.string.document_number),
+                        identityDocument.documentNumber
+                    )
                 }
-//                Image(
-//                    painter = painterResource(id = R.drawable.europe_flag),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .align(
-//                            Alignment.TopEnd
-//                        )
-//                        .height(20.dp)
-//                )
             }
             Row {
                 Icon(
@@ -92,24 +89,26 @@ fun PassportCard(
                 ) {
                     // Name Row
                     IdentityField(
-                        "NOM",
+                        stringResource(R.string.last_name),
                         identityDocument.lastName.uppercase(),
                         fontSize = IdentityFieldFontSize.LARGE
                     )
                     IdentityField(
-                        "Prénoms",
+                        stringResource(R.string.first_names),
                         identityDocument.firstName,
                         fontSize = IdentityFieldFontSize.LARGE
                     )
-
 
                     // Nationality, Gender, Birthdate Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        IdentityField("NATIONALITÉ", identityDocument.nationality)
+                        IdentityField(
+                            stringResource(R.string.nationality),
+                            identityDocument.nationality
+                        )
                         Spacer(modifier = Modifier.width(16.dp))
-                        IdentityField("SEXE", identityDocument.gender)
+                        IdentityField(stringResource(R.string.gender), identityDocument.gender)
                     }
 
                     Row(
@@ -117,11 +116,13 @@ fun PassportCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IdentityField(
-                            "DATE DE NAISS.",
+                            stringResource(R.string.birth_date),
                             identityDocument.birthDate
                         )
-                        IdentityField("LIEU DE NAISSANCE", identityDocument.placeOfBirth)
-
+                        IdentityField(
+                            stringResource(R.string.place_of_birth),
+                            identityDocument.placeOfBirth
+                        )
                     }
 
                     Row(
@@ -129,18 +130,21 @@ fun PassportCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            IdentityField("DATE DE DELIVRANCE", identityDocument.deliveryDate)
                             IdentityField(
-                                "DATE D'EXPIR",
+                                stringResource(R.string.delivery_date),
+                                identityDocument.deliveryDate
+                            )
+                            IdentityField(
+                                stringResource(R.string.expiration_date),
                                 identityDocument.expirationDate
                             )
                         }
 
                         AddressField(
-                            "DOMICILE",
+                            stringResource(R.string.address),
                             listOf(
                                 identityDocument.address,
-                                "${identityDocument.postalCode} ${identityDocument.city}",
+                                "${identityDocument.zipCode} ${identityDocument.city}",
                                 identityDocument.country
                             ),
                             modifier = Modifier.padding(start = 8.dp)
@@ -157,7 +161,7 @@ fun PassportCard(
 @Composable
 fun IdentityCardPreview() {
     val document = IdentityDocument(
-        type = DocumentType.ID_CARD,
+        type = DocumentType.PASSPORT,
         documentNumber = "13A000026",
         issuingIsO3Country = "FRA",
         lastName = "Doe",
@@ -168,7 +172,7 @@ fun IdentityCardPreview() {
         expirationDate = "23/12/2045",
         placeOfBirth = "Strasbourg",
         address = "Boulevard du General de Gaule",
-        postalCode = "75001",
+        zipCode = "75001",
         city = "Saint Romain en Provence",
         country = "France"
     )
@@ -182,7 +186,7 @@ fun IdentityCardPreview() {
 @Composable
 fun IdentityCardPreviewWithMissingData() {
     val document = IdentityDocument(
-        type = DocumentType.ID_CARD,
+        type = DocumentType.PASSPORT,
         documentNumber = "13A000026",
         issuingIsO3Country = "FRA",
         lastName = "Doe",
@@ -193,7 +197,7 @@ fun IdentityCardPreviewWithMissingData() {
         birthDate = "03/04/1982",
         expirationDate = "23/12/2045",
         address = "",  // Missing data
-        postalCode = "",  // Missing data
+        zipCode = "",  // Missing data
         city = "Paris",
         country = ""  // Missing data
     )

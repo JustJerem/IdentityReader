@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,7 +52,7 @@ fun FrontIdentityCard(
         Column(modifier = Modifier.padding(8.dp)) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
                 Text(
-                    text = "Pièce d'identité".uppercase(),
+                    text = stringResource(R.string.identity_card).uppercase(),
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 2.sp,
                     color = Color(0xFF003399),
@@ -94,40 +95,47 @@ fun FrontIdentityCard(
                 ) {
                     // Name Row
                     IdentityField(
-                        "NOM",
+                        stringResource(R.string.last_name),
                         identityDocument.lastName.uppercase(),
                         fontSize = IdentityFieldFontSize.LARGE
                     )
                     IdentityField(
-                        "Prénoms",
+                        stringResource(R.string.first_names),
                         identityDocument.firstName,
                         fontSize = IdentityFieldFontSize.LARGE
                     )
-
 
                     // Nationality, Gender, Birthdate Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        IdentityField("SEXE", identityDocument.gender)
-                        IdentityField("NATIONALITÉ", identityDocument.nationality)
+                        IdentityField(stringResource(R.string.gender), identityDocument.gender)
                         IdentityField(
-                            "DATE DE NAISS.",
+                            stringResource(R.string.nationality),
+                            identityDocument.nationality
+                        )
+                        IdentityField(
+                            stringResource(R.string.birth_date),
                             identityDocument.birthDate
                         )
                     }
-                    IdentityField("LIEU DE NAISSANCE", identityDocument.placeOfBirth)
-
+                    IdentityField(
+                        stringResource(R.string.place_of_birth),
+                        identityDocument.placeOfBirth
+                    )
 
                     // Document Number and Origin
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        DocumentField("N° DU DOCUMENT", identityDocument.documentNumber)
+                        DocumentField(
+                            stringResource(R.string.document_number),
+                            identityDocument.documentNumber
+                        )
                         IdentityField(
-                            "DATE D'EXPIR",
+                            stringResource(R.string.expiration_date_short),
                             identityDocument.expirationDate
                         )
                     }
@@ -174,7 +182,7 @@ fun IdentityField(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    fontSize: IdentityFieldFontSize = IdentityFieldFontSize.SMALL
+    fontSize: IdentityFieldFontSize = IdentityFieldFontSize.SMALL,
 ) {
     Column(modifier.padding(top = 2.dp)) {
         IdentityFieldLabel(label)
@@ -248,7 +256,7 @@ fun IdentityCardPreview() {
         expirationDate = "23/12/2045",
         placeOfBirth = "Strasbourg",
         address = "Main Street",
-        postalCode = "75001",
+        zipCode = "75001",
         city = "Paris",
         country = "France"
     )
@@ -273,7 +281,7 @@ fun IdentityCardPreviewWithMissingData() {
         birthDate = "03/04/1982",
         expirationDate = "23/12/2045",
         address = "",  // Missing data
-        postalCode = "",  // Missing data
+        zipCode = "",  // Missing data
         city = "Paris",
         country = ""  // Missing data
     )

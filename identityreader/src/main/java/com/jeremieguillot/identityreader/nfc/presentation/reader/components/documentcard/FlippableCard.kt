@@ -16,7 +16,7 @@ import com.jeremieguillot.identityreader.core.domain.DocumentType
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.BackIdentityCard
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.FrontIdentityCard
-import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.passport.BackPassportCard
+import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.identitycard.FrontStayCard
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.passport.PassportCard
 
 enum class CardFace(val angle: Float) {
@@ -75,7 +75,7 @@ fun FlipCard(
 fun FlippableCard(
     modifier: Modifier = Modifier,
     cardModifier: Modifier = Modifier,
-    identityDocument: IdentityDocument
+    identityDocument: IdentityDocument,
 ) {
     var cardFace by remember {
         mutableStateOf(CardFace.Front)
@@ -85,18 +85,18 @@ fun FlippableCard(
         modifier = modifier,
         cardFace = cardFace,
         onClick = {
-//            cardFace = cardFace.next
+            cardFace = cardFace.next
         },
         front = {
             when (identityDocument.type) {
                 DocumentType.PASSPORT -> PassportCard(cardModifier, identityDocument)
                 DocumentType.ID_CARD -> FrontIdentityCard(cardModifier, identityDocument)
+                DocumentType.RESIDENT_PERMIT -> FrontStayCard(cardModifier, identityDocument)
                 else -> {}
             }
         },
         back = {
             when (identityDocument.type) {
-                DocumentType.PASSPORT -> BackPassportCard(cardModifier)
                 DocumentType.ID_CARD -> BackIdentityCard(cardModifier, identityDocument)
                 else -> {}
             }

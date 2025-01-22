@@ -42,7 +42,7 @@ fun BackIdentityCard(
                 "Adresse",
                 listOf(
                     identityDocument.address,
-                    "${identityDocument.postalCode} ${identityDocument.city}",
+                    "${identityDocument.zipCode} ${identityDocument.city}",
                     identityDocument.country
                 )
             )
@@ -100,7 +100,7 @@ fun BackCardPreview() {
         expirationDate = "23/12/2045",
         placeOfBirth = "Strasbourg",
         address = "Main Street",
-        postalCode = "75001",
+        zipCode = "75001",
         city = "Paris",
         country = "France"
     )
@@ -125,7 +125,7 @@ fun BackCardPreviewWithMissingData() {
         birthDate = "03/04/1982",
         expirationDate = "23/12/2045",
         address = "",  // Missing data
-        postalCode = "",  // Missing data
+        zipCode = "",  // Missing data
         city = "Paris",
         country = ""  // Missing data
     )

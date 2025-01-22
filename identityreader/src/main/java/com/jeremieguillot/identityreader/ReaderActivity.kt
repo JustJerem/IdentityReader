@@ -19,11 +19,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.jeremieguillot.identityreader.core.domain.DataDocument
+import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.core.presentation.CustomNavType
 import com.jeremieguillot.identityreader.core.presentation.Destination
 import com.jeremieguillot.identityreader.core.ui.theme.IdentityReaderTheme
 import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderScreen
+import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderViewModel
 import com.jeremieguillot.identityreader.scan.presentation.ScanScreen
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.security.Security
 import kotlin.reflect.typeOf
 
 const val ReaderResult = "identity_document"
@@ -31,9 +35,18 @@ const val ReaderResult = "identity_document"
 class ReaderActivity : ComponentActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
+    private val returnIdentityDocumentResult: (IdentityDocument) -> Unit = { doc ->
+        apply {
+            setResult(RESULT_OK, Intent().putExtra(ReaderResult, doc))
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Security.removeProvider("BC")
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
+
         if (!hasRequiredPermissions()) {
             ActivityCompat.requestPermissions(
                 this, CAMERAX_PERMISSIONS, 0
@@ -49,18 +62,27 @@ class ReaderActivity : ComponentActivity() {
                     startDestination = Destination.ScannerScreen
                 ) {
                     composable<Destination.ScannerScreen> {
-                        ScanScreen(navController)
+                        ScanScreen(
+                            navigateToNfcReader = { dataDocument ->
+                                navController.navigate(Destination.ReaderScreen(dataDocument))
+                            },
+                            navigateToIdentityDisplay = returnIdentityDocumentResult
+                        )
                     }
+
                     composable<Destination.ReaderScreen>(
                         typeMap = mapOf(
                             typeOf<DataDocument>() to CustomNavType(
-                                DataDocument::class.java,
-                                DataDocument.serializer()
+                                DataDocument::class.java, DataDocument.serializer()
                             )
                         )
                     ) {
                         val args = it.toRoute<Destination.ReaderScreen>()
-                        NfcReaderScreen(args.dataDocument)
+                        val viewModel = NfcReaderViewModel(args.dataDocument)
+                        NfcReaderScreen(
+                            viewModel = viewModel,
+                            navigateToIdentityDisplay = returnIdentityDocumentResult
+                        )
                     }
                 }
             }

@@ -5,5 +5,15 @@ enum class DocumentType {
     DRIVING_LICENCE,
     RESIDENT_PERMIT,
     ID_CARD,
-    OLD_ID_CARD,
+    OLD_ID_CARD;
+
+    /*
+     * Check if the document type has an associated NFC chip
+     */
+    fun hasNfcChip(): Boolean {
+        return when (this) {
+            PASSPORT, RESIDENT_PERMIT, ID_CARD -> true
+            else -> false
+        }
+    }
 }

@@ -42,10 +42,9 @@ fun String.toSlashStringDate(pattern: String = "yyMMdd", forceDateInPast: Boolea
         val formatter = DateTimeFormatter.ofPattern(pattern)
         var parsedDate = LocalDate.parse(this, formatter)
 
-        if (forceDateInPast) {
+        if (forceDateInPast && parsedDate.isAfter(LocalDate.now())) {
             parsedDate = parsedDate.minusYears(100)
         }
-
 
         val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         return parsedDate.format(outputFormatter)
