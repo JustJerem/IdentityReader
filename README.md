@@ -48,7 +48,7 @@ https://github.com/JustJerem/OlympicGame/IdentityReader/master/documentation/vid
 
 ## Architecture Overview
 
-[](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Overview.png)
+[<img src="https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Overview.png"/>](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Overview.png)
 
 ## 🛠 Built With
 
