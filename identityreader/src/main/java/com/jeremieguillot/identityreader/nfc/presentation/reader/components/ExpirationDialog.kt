@@ -10,7 +10,6 @@ import com.jeremieguillot.identityreader.R
 
 @Composable
 fun ExpirationDialog(
-    showDialog: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit = onDismiss,  // Optional parameter
@@ -19,26 +18,24 @@ fun ExpirationDialog(
     confirmButtonText: String = stringResource(R.string.yes),
     dismissButtonText: String = stringResource(R.string.no),
 ) {
-    if (showDialog) {
-        AlertDialog(
-            containerColor = Color.White,
-            onDismissRequest = onDismissRequest,
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(dismissButtonText)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = onConfirm) {
-                    Text(confirmButtonText)
-                }
-            },
-            title = {
-                Text(title)
-            },
-            text = {
-                Text(text)
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = onDismissRequest,
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(dismissButtonText)
             }
-        )
-    }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(confirmButtonText)
+            }
+        },
+        title = {
+            Text(title)
+        },
+        text = {
+            Text(text)
+        }
+    )
 }

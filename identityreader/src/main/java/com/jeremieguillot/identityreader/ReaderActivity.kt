@@ -24,6 +24,7 @@ import com.jeremieguillot.identityreader.core.presentation.CustomNavType
 import com.jeremieguillot.identityreader.core.presentation.Destination
 import com.jeremieguillot.identityreader.core.ui.theme.IdentityReaderTheme
 import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderScreen
+import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderViewModel
 import com.jeremieguillot.identityreader.scan.presentation.ScanScreen
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
@@ -65,7 +66,7 @@ class ReaderActivity : ComponentActivity() {
                             navigateToNfcReader = { dataDocument ->
                                 navController.navigate(Destination.ReaderScreen(dataDocument))
                             },
-                            returnIdentityDocumentResult = returnIdentityDocumentResult
+                            navigateToIdentityDisplay = returnIdentityDocumentResult
                         )
                     }
 
@@ -77,9 +78,10 @@ class ReaderActivity : ComponentActivity() {
                         )
                     ) {
                         val args = it.toRoute<Destination.ReaderScreen>()
+                        val viewModel = NfcReaderViewModel(args.dataDocument)
                         NfcReaderScreen(
-                            dataDocument = args.dataDocument,
-                            returnIdentityDocumentResult = returnIdentityDocumentResult
+                            viewModel = viewModel,
+                            navigateToIdentityDisplay = returnIdentityDocumentResult
                         )
                     }
                 }

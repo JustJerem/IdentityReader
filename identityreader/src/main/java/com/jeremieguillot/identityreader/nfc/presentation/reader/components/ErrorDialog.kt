@@ -10,28 +10,25 @@ import com.jeremieguillot.identityreader.R
 
 @Composable
 fun ErrorDialog(
-    showDialog: Boolean,
     onDismiss: () -> Unit,
     onDismissRequest: () -> Unit = onDismiss,  // Optional parameter
     title: String = stringResource(R.string.technical_error_title),
     text: String = stringResource(R.string.technical_error_description),
     dismissButtonText: String = stringResource(R.string.to_continue),
 ) {
-    if (showDialog) {
-        AlertDialog(
-            containerColor = Color.White,
-            onDismissRequest = onDismissRequest,
-            confirmButton = {
-                TextButton(onClick = onDismiss) {
-                    Text(dismissButtonText)
-                }
-            },
-            title = {
-                Text(title)
-            },
-            text = {
-                Text(text)
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(dismissButtonText)
             }
-        )
-    }
+        },
+        title = {
+            Text(title)
+        },
+        text = {
+            Text(text)
+        }
+    )
 }

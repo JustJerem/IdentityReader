@@ -2,6 +2,7 @@ package com.jeremieguillot.identityreader.scan.data
 
 import com.google.common.truth.Truth.assertThat
 import com.jeremieguillot.identityreader.core.domain.DocumentType
+import com.jeremieguillot.identityreader.scan.domain.DocumentTypeIdentifier
 import org.junit.Test
 
 class DocumentTypeIdentifierTest {

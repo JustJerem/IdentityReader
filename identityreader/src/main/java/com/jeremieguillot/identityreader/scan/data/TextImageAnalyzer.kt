@@ -20,8 +20,6 @@ class TextImageAnalyzer(val onSuccess: (List<Text.TextBlock>) -> Unit) : ImageAn
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
-                    val resultText = visionText.text
-                    Timber.tag("resultText").i(resultText)
                     imageProxy.close()
                     onSuccess(visionText.textBlocks)
                 }

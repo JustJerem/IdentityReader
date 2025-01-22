@@ -19,7 +19,6 @@ import com.jeremieguillot.identityreader.nfc.presentation.reader.components.Erro
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.ExpirationDialog
 import com.jeremieguillot.identityreader.scan.data.MRZRecognitionOCR
 import com.jeremieguillot.identityreader.scan.data.TextImageAnalyzer
-import com.jeremieguillot.identityreader.scan.domain.DocumentValidityAnalyzer
 import com.jeremieguillot.identityreader.scan.presentation.ScanContract.ScanIntent
 import com.jeremieguillot.identityreader.scan.presentation.camera.CameraPreview
 import com.jeremieguillot.identityreader.scan.presentation.camera.OverlayScreen
@@ -27,7 +26,7 @@ import com.jeremieguillot.identityreader.scan.presentation.camera.OverlayScreen
 @Composable
 fun ScanScreen(
     navigateToNfcReader: (DataDocument) -> Unit,
-    returnIdentityDocumentResult: (IdentityDocument) -> Unit,
+    navigateToIdentityDisplay: (IdentityDocument) -> Unit,
     viewModel: ScanViewModel = remember { ScanViewModel() }
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -38,7 +37,7 @@ fun ScanScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is ScanContract.ScanEvent.NavigateToNfcReader -> navigateToNfcReader(event.dataDocument)
-                is ScanContract.ScanEvent.ReturnIdentityDocumentResult -> returnIdentityDocumentResult(
+                is ScanContract.ScanEvent.ReturnIdentityDocumentResult -> navigateToIdentityDisplay(
                     event.identityDocument
                 )
             }
@@ -48,14 +47,12 @@ fun ScanScreen(
     // Handle dialogs
     if (state.showErrorDialog) {
         ErrorDialog(
-            showDialog = true,
             onDismiss = { viewModel.processIntent(ScanIntent.ResetErrorCount) }
         )
     }
 
     if (state.showExpirationDialog) {
         ExpirationDialog(
-            showDialog = true,
             onDismiss = { viewModel.processIntent(ScanIntent.DismissExpirationDialog) },
             onConfirm = { viewModel.processIntent(ScanIntent.ConfirmIdentity) }
         )
@@ -99,12 +96,11 @@ fun ScanScreen(
 
 fun processDocument(
     identity: IdentityDocument?,
-    showDialog: () -> Unit,
     returnIdentityDocumentResult: (IdentityDocument) -> Unit,
 ) = identity?.let { doc ->
-    if (DocumentValidityAnalyzer(doc).expirationDateIsInThePast()) {
-        showDialog()
-    } else {
+//    if (DocumentValidityAnalyzer(doc).expirationDateIsInThePast()) {
+//        showDialog()
+//    } else {
         returnIdentityDocumentResult(doc)
-    }
+//    }
 }

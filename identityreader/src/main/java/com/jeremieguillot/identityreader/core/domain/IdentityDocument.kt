@@ -1,10 +1,7 @@
 package com.jeremieguillot.identityreader.core.domain
 
 import android.os.Parcelable
-import com.jeremieguillot.identityreader.core.extension.fromYYMMDDtoDate
-import com.jeremieguillot.identityreader.core.extension.toLocaleDateStringSeparated
 import kotlinx.parcelize.Parcelize
-import java.util.Locale
 
 @Parcelize
 data class IdentityDocument(
@@ -24,29 +21,4 @@ data class IdentityDocument(
     var zipCode: String = "",
     var city: String = "",
     val country: String = "",
-) : Parcelable {
-    companion object {
-        fun toIdentityDocument(dataDocument: DataDocument): IdentityDocument {
-            return IdentityDocument(
-                type = dataDocument.type,
-                documentNumber = dataDocument.documentNumber,
-                issuingIsO3Country = Locale("", dataDocument.issuingCountry).isO3Country,
-                lastName = dataDocument.lastName,
-                firstName = dataDocument.firstName,
-                nationality = Locale("", dataDocument.nationality).country,
-                gender = dataDocument.sex,
-                placeOfBirth = "",
-                birthDate = dataDocument.dateOfBirth.fromYYMMDDtoDate()
-                    ?.toLocaleDateStringSeparated().orEmpty(),
-                expirationDate = dataDocument.dateOfExpiry.fromYYMMDDtoDate()
-                    ?.toLocaleDateStringSeparated().orEmpty(),
-                deliveryDate = dataDocument.deliveryDate.fromYYMMDDtoDate()
-                    ?.toLocaleDateStringSeparated().orEmpty(),
-                address = "",  // Missing data
-                zipCode = "",  // Missing data
-                city = "",
-                country = ""  // Missing data
-            )
-        }
-    }
-}
+) : Parcelable

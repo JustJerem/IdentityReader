@@ -3,6 +3,7 @@ package com.jeremieguillot.identityreader.nfc.presentation.reader
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
@@ -17,12 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,14 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.util.Consumer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jeremieguillot.identityreader.R
 import com.jeremieguillot.identityreader.ReaderActivity
-import com.jeremieguillot.identityreader.core.domain.DataDocument
 import com.jeremieguillot.identityreader.core.domain.IdentityDocument
-import com.jeremieguillot.identityreader.core.domain.IdentityDocument.Companion.toIdentityDocument
-import com.jeremieguillot.identityreader.core.domain.util.Result
-import com.jeremieguillot.identityreader.nfc.data.NFCReader
-import com.jeremieguillot.identityreader.nfc.domain.NfcReaderStatus
+import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderContract.NfcReaderEvent
+import com.jeremieguillot.identityreader.nfc.presentation.reader.NfcReaderContract.NfcReaderIntent
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.ExpirationDialog
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.IrregularDataDialog
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.RippleEffect
@@ -48,87 +43,66 @@ import com.jeremieguillot.identityreader.nfc.presentation.reader.components.getD
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.getTitle
 import com.jeremieguillot.identityreader.scan.domain.DocumentValidityAnalyzer
 import com.jeremieguillot.identityreader.scan.domain.DocumentValidityIssue
-import com.jeremieguillot.identityreader.scan.presentation.processDocument
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
 @Composable
 fun NfcReaderScreen(
-    dataDocument: DataDocument,
-    returnIdentityDocumentResult: (IdentityDocument) -> Unit,
+    navigateToIdentityDisplay: (IdentityDocument) -> Unit,
+    viewModel: NfcReaderViewModel
 ) {
-
-    val context = LocalContext.current
-    val scope = CoroutineScope(Dispatchers.Default)
-    val reader = remember { NFCReader(dataDocument) }
-    val identityDocument =
-        remember { mutableStateOf(toIdentityDocument(dataDocument)) }
-    val status by reader.status.collectAsState(NfcReaderStatus.IDLE)
-    var identity by remember { mutableStateOf<IdentityDocument?>(null) }
-
-    var showExpirationDialog by remember { mutableStateOf(false) }
-    var isNFCTimedOut by remember { mutableStateOf(false) }
-
-    val irregularities = remember { mutableStateListOf<DocumentValidityIssue>() }
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current as ReaderActivity
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        delay(8000L) // 8 seconds delay
-        isNFCTimedOut = true
-    }
-
-    ExpirationDialog(
-        showDialog = showExpirationDialog,
-        onDismiss = {
-            showExpirationDialog = false
-            (context as ReaderActivity).finish()
-        }, onConfirm = {
-            returnIdentityDocumentResult(identity!!)
-        }
-    )
-
-    if (irregularities.isNotEmpty()) {
-        IrregularDataDialog(
-            irregularities = irregularities,
-            onDismiss = {
-                irregularities.clear()
-                returnIdentityDocumentResult(identity!!)
+        viewModel.events.collect { event ->
+            when (event) {
+                is NfcReaderEvent.NavigateToIdentityDisplay -> {
+                    navigateToIdentityDisplay(event.doc)
+                }
             }
-        )
+        }
     }
+
 
     DisposableEffect(Unit) {
         val listener = Consumer<Intent> { intent ->
-            val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-            if (tag!!.techList.contains("android.nfc.tech.IsoDep")) {
-                scope.launch {
-                    when (val result = reader.onTagDiscovered(tag, dataDocument.type)) {
-                        is Result.Error -> {
-                            //what to do ?
-                        }
-
-                        is Result.Success -> {
-                            identity = result.data
-                            processNFCDocument(
-                                identity = identity,
-                                showDialog = { showExpirationDialog = true },
-                                showIrregularDataDialog = { irregularities.addAll(it) },
-                                returnIdentityDocumentResult = returnIdentityDocumentResult
-                            )
-                        }
-                    }
-                }
+            val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
             } else {
-                Timber.tag("ERROR").e("Error isoDep")
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+            }
+
+            if (tag != null && tag.techList.contains("android.nfc.tech.IsoDep")) {
+                viewModel.handleIntent(NfcReaderIntent.ProcessTag(tag))
+            } else {
+                Timber.tag("ERROR").e("Error: Unsupported tag detected")
             }
         }
-        (context as ReaderActivity).addOnNewIntentListener(listener)
-        onDispose { context.removeOnNewIntentListener(listener) }
+        context.addOnNewIntentListener(listener)
+        onDispose {
+            context.removeOnNewIntentListener(listener)
+        }
     }
 
+    if (state.showExpirationDialog) {
+        ExpirationDialog(
+            onDismiss = { viewModel.handleIntent(NfcReaderIntent.DismissDialogs) },
+            onConfirm = { state.identityDocument?.let(navigateToIdentityDisplay) }
+        )
+    }
+
+    if (state.irregularities.isNotEmpty()) {
+        IrregularDataDialog(
+            irregularities = state.irregularities,
+            onDismiss = {
+                viewModel.handleIntent(NfcReaderIntent.DismissDialogs)
+                state.identityDocument?.let(navigateToIdentityDisplay)
+            }
+        )
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -137,14 +111,16 @@ fun NfcReaderScreen(
                 .fillMaxSize()
         ) {
 
-            FlippableCard(
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                cardModifier = Modifier.padding(6.dp),
-                identityDocument = identityDocument.value
-            )
+            state.identityDocument?.let { identityDocument ->
+                FlippableCard(
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    cardModifier = Modifier.padding(6.dp),
+                    identityDocument = identityDocument
+                )
+            }
 
             RippleEffect(
-                status.color,
+                state.status.color,
                 Modifier
                     .align(Alignment.Center)
                     .padding(top = 32.dp)
@@ -158,18 +134,17 @@ fun NfcReaderScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    status.getTitle(), fontSize = 14.sp, fontWeight = FontWeight.SemiBold
+                    state.status.getTitle(), fontSize = 14.sp, fontWeight = FontWeight.SemiBold
                 )
-                Text(status.getDescription(), textAlign = TextAlign.Center, fontSize = 12.sp)
+                Text(state.status.getDescription(), textAlign = TextAlign.Center, fontSize = 12.sp)
                 Spacer(modifier = Modifier.height(8.dp))
-                AnimatedVisibility(visible = isNFCTimedOut) {
+                AnimatedVisibility(visible = state.isNFCTimedOut) {
                     Button(onClick = {
-                        identity = toIdentityDocument(dataDocument)
-                        processDocument(
-                            identity = identity,
-                            showDialog = { showExpirationDialog = true },
-                            returnIdentityDocumentResult = returnIdentityDocumentResult
-                        )
+                        state.identityDocument?.let { identityDocument ->
+                            navigateToIdentityDisplay(
+                                identityDocument
+                            )
+                        }
                     }) {
                         Text(
                             text = stringResource(R.string.scan_without_nfc),

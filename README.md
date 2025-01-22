@@ -1,12 +1,39 @@
 # Identity Reader
 
-Application for ID scanner document. MVI, multi-module & Clean Architecture.
+A modern application designed for scanning and processing identity documents such as passports,
+French ID cards, and residence permits. The app leverages the **MVI pattern**, **multi-module
+architecture**, and **Clean Architecture principles** for scalability and maintainability.
 
-*
-* Internationalized for English, Spanish and French
-* Dark & Light mode
+## Features
+
+- **MRZ Strip Scanning**  
+  Efficiently scans and extracts data from the MRZ strip on identity documents.
+
+- **Document Type Recognition**  
+  Identifies document types (e.g., passport, ID card, etc.) using Regex-based validation.
+
+- **NFC Chip Integration**
+  - Listens for NFC chip interactions.
+  - Reads NFC chip data and securely transfers information.
+
+- **Data Validation**  
+  Validates extracted data to ensure accuracy and consistency.
+
+- **Data Display**  
+  Presents extracted and validated data in a user-friendly interface.
+
+### Additional Highlights
+
+- **Internationalization**  
+  Fully localized for English, Spanish, and French.
+
+- **Dark & Light Mode**  
+  Supports both dark and light themes for an optimal user experience across various lighting
+  conditions.
 
 ## Video
+
+https://github.com/JustJerem/OlympicGame/IdentityReader/master/documentation/video.mp4
 
 ## Screen Shots
 
@@ -21,7 +48,7 @@ Application for ID scanner document. MVI, multi-module & Clean Architecture.
 
 ## Architecture Overview
 
-## Architecture Data Flow
+[](https://raw.githubusercontent.com/JustJerem/IdentityReader/master/documentation/Overview.png)
 
 ## 🛠 Built With
 

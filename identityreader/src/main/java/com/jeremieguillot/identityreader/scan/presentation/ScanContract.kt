@@ -19,7 +19,7 @@ class ScanContract {
         data object ConfirmIdentity : ScanIntent()
     }
 
-    data class ScanUiState(
+    data class ScanState(
         val identity: IdentityDocument? = null,
         val showExpirationDialog: Boolean = false,
         val showErrorDialog: Boolean = false
