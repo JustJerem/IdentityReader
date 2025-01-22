@@ -46,10 +46,9 @@ import com.jeremieguillot.identityreader.nfc.presentation.reader.components.Ripp
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.documentcard.FlippableCard
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.getDescription
 import com.jeremieguillot.identityreader.nfc.presentation.reader.components.getTitle
+import com.jeremieguillot.identityreader.scan.domain.DocumentValidityAnalyzer
 import com.jeremieguillot.identityreader.scan.domain.DocumentValidityIssue
 import com.jeremieguillot.identityreader.scan.presentation.processDocument
-import com.jeremieguillot.identityreader.scan.presentation.processNFCDocument
-import com.jeremieguillot.identityreader.scan.presentation.returnIdentityDocumentResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -58,7 +57,10 @@ import timber.log.Timber
 
 
 @Composable
-fun NfcReaderScreen(dataDocument: DataDocument) {
+fun NfcReaderScreen(
+    dataDocument: DataDocument,
+    returnIdentityDocumentResult: (IdentityDocument) -> Unit,
+) {
 
     val context = LocalContext.current
     val scope = CoroutineScope(Dispatchers.Default)
@@ -78,20 +80,22 @@ fun NfcReaderScreen(dataDocument: DataDocument) {
         isNFCTimedOut = true
     }
 
-
-    ExpirationDialog(showDialog = showExpirationDialog, onDismiss = {
-        showExpirationDialog = false
-        (context as ReaderActivity).finish()
-    }, onConfirm = {
-        returnIdentityDocumentResult(context, identity!!)
-    })
+    ExpirationDialog(
+        showDialog = showExpirationDialog,
+        onDismiss = {
+            showExpirationDialog = false
+            (context as ReaderActivity).finish()
+        }, onConfirm = {
+            returnIdentityDocumentResult(identity!!)
+        }
+    )
 
     if (irregularities.isNotEmpty()) {
         IrregularDataDialog(
             irregularities = irregularities,
             onDismiss = {
                 irregularities.clear()
-                returnIdentityDocumentResult(context, identity!!)
+                returnIdentityDocumentResult(identity!!)
             }
         )
     }
@@ -109,10 +113,11 @@ fun NfcReaderScreen(dataDocument: DataDocument) {
                         is Result.Success -> {
                             identity = result.data
                             processNFCDocument(
-                                context = context,
                                 identity = identity,
                                 showDialog = { showExpirationDialog = true },
-                                showIrregularDataDialog = { irregularities.addAll(it) })
+                                showIrregularDataDialog = { irregularities.addAll(it) },
+                                returnIdentityDocumentResult = returnIdentityDocumentResult
+                            )
                         }
                     }
                 }
@@ -161,9 +166,9 @@ fun NfcReaderScreen(dataDocument: DataDocument) {
                     Button(onClick = {
                         identity = toIdentityDocument(dataDocument)
                         processDocument(
-                            context = context,
                             identity = identity,
                             showDialog = { showExpirationDialog = true },
+                            returnIdentityDocumentResult = returnIdentityDocumentResult
                         )
                     }) {
                         Text(
@@ -173,6 +178,27 @@ fun NfcReaderScreen(dataDocument: DataDocument) {
                     }
                 }
             }
+        }
+    }
+}
+
+fun processNFCDocument(
+    identity: IdentityDocument?,
+    showDialog: () -> Unit,
+    showIrregularDataDialog: (List<DocumentValidityIssue>) -> Unit,
+    returnIdentityDocumentResult: (IdentityDocument) -> Unit,
+) {
+    identity?.let { doc ->
+        val analyzer = DocumentValidityAnalyzer(doc)
+        val irregularities = analyzer.processIrregularities()
+
+        when {
+            analyzer.expirationDateIsInThePast() -> showDialog()
+            irregularities.isNotEmpty() && doc.type.hasNfcChip() -> showIrregularDataDialog(
+                irregularities
+            )
+
+            else -> returnIdentityDocumentResult(doc)
         }
     }
 }

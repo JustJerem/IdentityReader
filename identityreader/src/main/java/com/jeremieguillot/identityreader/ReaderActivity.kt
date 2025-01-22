@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.jeremieguillot.identityreader.core.domain.DataDocument
+import com.jeremieguillot.identityreader.core.domain.IdentityDocument
 import com.jeremieguillot.identityreader.core.presentation.CustomNavType
 import com.jeremieguillot.identityreader.core.presentation.Destination
 import com.jeremieguillot.identityreader.core.ui.theme.IdentityReaderTheme
@@ -33,6 +34,12 @@ const val ReaderResult = "identity_document"
 class ReaderActivity : ComponentActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
+    private val returnIdentityDocumentResult: (IdentityDocument) -> Unit = { doc ->
+        apply {
+            setResult(RESULT_OK, Intent().putExtra(ReaderResult, doc))
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,19 +64,23 @@ class ReaderActivity : ComponentActivity() {
                         ScanScreen(
                             navigateToNfcReader = { dataDocument ->
                                 navController.navigate(Destination.ReaderScreen(dataDocument))
-                            }
+                            },
+                            returnIdentityDocumentResult = returnIdentityDocumentResult
                         )
                     }
+
                     composable<Destination.ReaderScreen>(
                         typeMap = mapOf(
                             typeOf<DataDocument>() to CustomNavType(
-                                DataDocument::class.java,
-                                DataDocument.serializer()
+                                DataDocument::class.java, DataDocument.serializer()
                             )
                         )
                     ) {
                         val args = it.toRoute<Destination.ReaderScreen>()
-                        NfcReaderScreen(args.dataDocument)
+                        NfcReaderScreen(
+                            dataDocument = args.dataDocument,
+                            returnIdentityDocumentResult = returnIdentityDocumentResult
+                        )
                     }
                 }
             }
